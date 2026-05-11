@@ -1,0 +1,163 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+@font-face {
+    font-family: 'LINE Seed Sans TH';
+    src: url('/fonts/LINESeedSansTH_W_Th.woff2') format('woff2');
+    font-weight: 100 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'LINE Seed Sans TH';
+    src: url('/fonts/LINESeedSansTH_W_Rg.woff2') format('woff2');
+    font-weight: 400 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'LINE Seed Sans TH';
+    src: url('/fonts/LINESeedSansTH_W_Bd.woff2') format('woff2');
+    font-weight: 600 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'LINE Seed Sans TH';
+    src: url('/fonts/LINESeedSansTH_W_XBd.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'LINE Seed Sans TH';
+    src: url('/fonts/LINESeedSansTH_W_He.woff2') format('woff2');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@theme {
+    --font-sans: "LINE Seed Sans TH", ui-sans-serif, system-ui, sans-serif;
+    
+    --color-primary-50: #f0f9ff;
+    --color-primary-100: #e0f2fe;
+    --color-primary-200: #bae6fd;
+    --color-primary-300: #7dd3fc;
+    --color-primary-400: #38bdf8;
+    --color-primary-500: #1ea2ff;
+    --color-primary-600: #0091ff;
+    --color-primary-700: #0077e6;
+    --color-primary-800: #005fcc;
+    --color-primary-900: #004aab;
+    --color-primary-950: #082f49;
+
+    @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+}
+
+@layer utilities {
+    .nav-full {
+        width: 100%;
+        height: 5rem;
+        @apply bg-white/95 dark:bg-gray-950/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800;
+        padding: 0 2rem;
+        top: 0;
+        margin-top: 0;
+        border-radius: 0;
+        box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    }
+
+    .nav-pill {
+        width: min(1440px, 95%) !important;
+        height: 4.2rem !important;
+        @apply bg-white/85 dark:bg-gray-900/85 backdrop-blur-xl border-none rounded-[100px] mt-5 px-10 shadow-2xl shadow-black/5 dark:shadow-black/40;
+    }
+
+    .bento-card {
+        background: #ffffff;
+        @apply dark:bg-gray-900 dark:border-gray-800;
+        transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .bento-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 30px 60px -12px rgba(30, 162, 255, 0.15);
+    }
+
+    .text-outline {
+        -webkit-text-stroke: 2px rgba(30, 162, 255, 0.6);
+        color: transparent;
+    }
+
+    .kinetic-text {
+        font-size: clamp(3rem, 15vw, 12rem);
+        line-height: 1.2;
+        font-weight: 900;
+        letter-spacing: -0.05em;
+    }
+
+    .marquee-container {
+        display: flex;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .marquee-content {
+        display: flex;
+        animation: marquee 20s linear infinite;
+    }
+
+    .reveal {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+        transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.active {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    .reveal-up {
+        opacity: 0;
+        transform: translateY(80px);
+        transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal-up.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .program-carousel-container {
+        position: relative;
+        margin: 0 -2rem;
+        padding: 2rem;
+        overflow: hidden;
+    }
+
+    .program-carousel-track {
+        display: flex;
+        gap: 2rem;
+        transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        padding: 1rem;
+    }
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    @apply font-sans antialiased text-gray-800 bg-[#ffffff] dark:bg-gray-950 dark:text-gray-100 selection:bg-primary-500 selection:text-[#ffffff];
+}

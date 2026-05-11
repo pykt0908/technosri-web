@@ -80,11 +80,14 @@ import Footer from "./components/Footer";
 import SmoothScroll from "./components/SmoothScroll";
 
 export default function App() {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith("/admin");
+
   return (
     <SmoothScroll>
-      <Navbar />
+      {!isAdmin && <Navbar />}
       <Outlet />
-      <Footer />
+      {!isAdmin && <Footer />}
     </SmoothScroll>
   );
 }

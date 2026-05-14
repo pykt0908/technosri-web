@@ -37,7 +37,7 @@ export default function UserManagement() {
     const fetchUsers = async () => {
         const token = localStorage.getItem("admin_token");
         try {
-            const res = await fetch("http://localhost:8000/api/users", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const data = await res.json();
@@ -141,7 +141,7 @@ export default function UserManagement() {
         e.preventDefault();
         const token = localStorage.getItem("admin_token");
         const method = editingUser ? "PUT" : "POST";
-        const url = editingUser ? `http://localhost:8000/api/users/${editingUser.id}` : "http://localhost:8000/api/users";
+        const url = editingUser ? `${import.meta.env.VITE_API_URL}/api/users/${editingUser.id}` : `${import.meta.env.VITE_API_URL}/api/users`;
 
         const loadingToast = toast.loading(editingUser ? "กำลังอัปเดตข้อมูล..." : "กำลังสร้างผู้ใช้งาน...");
 
@@ -178,7 +178,7 @@ export default function UserManagement() {
         const token = localStorage.getItem("admin_token");
         const loadingToast = toast.loading("กำลังลบข้อมูล...");
         try {
-            const res = await fetch(`http://localhost:8000/api/users/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${id}`, {
                 method: "DELETE",
                 headers: { "Authorization": `Bearer ${token}` }
             });
@@ -195,11 +195,14 @@ export default function UserManagement() {
     };
 
     return (
-        <div className="space-y-8">
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200 dark:border-slate-800 pb-8">
+        <div className="max-w-[1400px] mx-auto pb-20">
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-200 dark:border-slate-800 pb-8 mb-10 gap-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-800 dark:text-white tracking-tight ">จัดการผู้ใช้งาน</h1>
-
+                    <div className="flex items-center text-[10px] font-bold text-primary-600 uppercase tracking-widest mb-2 bg-primary-50 dark:bg-primary-900/20 px-3 py-1 rounded-full w-fit border border-primary-100 dark:border-primary-800">
+                        <i className="fas fa-users mr-2"></i> User Management
+                    </div>
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">จัดการผู้ใช้งานระบบ</h1>
+                    <p className="text-sm text-slate-500 mt-1">บริหารจัดการสิทธิ์การเข้าถึง และข้อมูลผู้ดูแลระบบทั้งหมด</p>
                 </div>
                 <button
                     onClick={() => openModal()}

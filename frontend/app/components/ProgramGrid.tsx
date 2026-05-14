@@ -66,20 +66,27 @@ export default function ProgramGrid() {
                             >
                                 {/* Image Container */}
                                 <div className="relative h-64 overflow-hidden">
-                                    <img
-                                        src={item.image}
-                                        alt={item.name}
-                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                    />
-                                    <div className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60`}></div>
-                                    <div className={`absolute top-4 right-4 px-4 py-1 rounded-full text-[10px] font-bold text-white uppercase tracking-widest bg-white/20 backdrop-blur-md border border-white/30`}>
-                                        {activeTab === "pvc" ? "ปวช." : "ปวส."}
-                                    </div>
+                                    {item.image ? (
+                                        <img
+                                            src={item.image}
+                                            alt={item.name}
+                                            className="w-full h-full object-cover transition-transform duration-700"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 text-primary-600 dark:text-primary-400 font-black text-5xl select-none">
+                                            {item.name.substring(0, 2)}
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Content */}
                                 <div className="p-8">
-                                    <h3 className="text-xl font-black text-gray-900 dark:text-white mb-4 leading-tight group-hover:text-primary-600 transition-colors">
+                                    <div className="mb-4">
+                                        <span className={`px-4 py-1 rounded-full text-[10px] font-bold text-white uppercase tracking-widest ${activeTab === "pvc" ? "bg-orange-500" : "bg-purple-600"}`}>
+                                            {activeTab === "pvc" ? "ปวช." : "ปวส."}
+                                        </span>
+                                    </div>
+                                    <h3 className="text-lg font-black text-gray-900 dark:text-white mb-4 leading-tight group-hover:text-primary-600 transition-colors">
                                         {item.name}
                                     </h3>
                                     <div className="flex items-center text-primary-500 font-bold text-sm">

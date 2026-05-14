@@ -15,18 +15,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./app.css";
 import TechLoader from "./components/TechLoader";
 
-export const links: Route.LinksFunction = () => [
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-  },
-];
+export const links: Route.LinksFunction = () => [];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const navigation = useNavigation();
@@ -37,8 +26,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
     if (navigation.state === "loading") {
       setIsTransitioning(true);
     } else {
-      // Small delay to make sure the loader is visible for a techy feel
-      const timer = setTimeout(() => setIsTransitioning(false), 800);
+      // Reduced delay for a snappier feel
+      const timer = setTimeout(() => setIsTransitioning(false), 300);
       return () => clearTimeout(timer);
     }
   }, [navigation.state]);
@@ -46,7 +35,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   // Also trigger on simple location changes if state doesn't stay 'loading'
   useEffect(() => {
     setIsTransitioning(true);
-    const timer = setTimeout(() => setIsTransitioning(false), 800);
+    const timer = setTimeout(() => setIsTransitioning(false), 300);
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
@@ -78,16 +67,31 @@ export function Layout({ children }: { children: React.ReactNode }) {
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import SmoothScroll from "./components/SmoothScroll";
+import BackToTop from "./components/BackToTop";
+import PDPAConsent from "./components/PDPAConsent";
 
 export default function App() {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
+
+  useEffect(() => {
+    if (!isAdmin) {
+      // Record visitor log
+      fetch(`${import.meta.env.VITE_API_URL}/api/analytics/log`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: location.pathname }),
+      }).catch(() => {}); // Silent fail
+    }
+  }, [location.pathname, isAdmin]);
 
   return (
     <SmoothScroll>
       {!isAdmin && <Navbar />}
       <Outlet />
       {!isAdmin && <Footer />}
+      <BackToTop />
+      {!isAdmin && <PDPAConsent />}
     </SmoothScroll>
   );
 }

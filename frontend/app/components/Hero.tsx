@@ -1,83 +1,150 @@
 import { useEffect, useState } from "react";
 import Reveal from "./Reveal";
 
-const carouselItems = [
-    {
-        image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-        alt: "บรรยากาศการเรียนการสอนในห้องปฏิบัติการโรงงานจำลอง"
-    },
-    {
-        image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-        alt: "ห้องปฏิบัติการคอมพิวเตอร์และเทคโนโลยีสารสนเทศที่ทันสมัย"
-    }
-];
+interface CarouselItem {
+    id: number;
+    image_path: string;
+    link_url: string | null;
+    link_target: "_self" | "_blank";
+}
 
-export default function Hero() {
+// Global cache
+let carouselCache: CarouselItem[] | null = null;
+let isFetchingCarousels = false;
+
+export default function Hero({ initialData = [] }: { initialData?: CarouselItem[] }) {
     const [activeIndex, setActiveIndex] = useState(0);
+    const [carousels, setCarousels] = useState<CarouselItem[]>(carouselCache || initialData);
+    const [loading, setLoading] = useState(!carouselCache && initialData.length === 0);
 
     const nextSlide = () => {
-        setActiveIndex((prev) => (prev + 1) % carouselItems.length);
+        if (carousels.length === 0) return;
+        setActiveIndex((prev) => (prev + 1) % carousels.length);
     };
 
     const prevSlide = () => {
-        setActiveIndex((prev) => (prev - 1 + carouselItems.length) % carouselItems.length);
+        if (carousels.length === 0) return;
+        setActiveIndex((prev) => (prev - 1 + carousels.length) % carousels.length);
     };
 
     useEffect(() => {
-        const timer = setInterval(nextSlide, 5000);
-        return () => clearInterval(timer);
+        if (carouselCache && carouselCache.length > 0) {
+            setCarousels(carouselCache);
+            setLoading(false);
+            return;
+        }
+
+        if (initialData && initialData.length > 0) {
+            setCarousels(initialData);
+            carouselCache = initialData;
+            setLoading(false);
+            return;
+        }
+
+        if (isFetchingCarousels) return;
+        isFetchingCarousels = true;
+
+        const fetchCarousels = async () => {
+            try {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/carousels/active`);
+                const data = await res.json();
+                setCarousels(data);
+                carouselCache = data;
+            } catch (err) {
+                console.error("Failed to fetch carousels");
+            } finally {
+                setLoading(false);
+                isFetchingCarousels = false;
+            }
+        };
+
+        fetchCarousels();
     }, []);
+
+    useEffect(() => {
+        if (carousels.length > 1) {
+            const timer = setInterval(nextSlide, 5000);
+            return () => clearInterval(timer);
+        }
+    }, [carousels.length]);
+
+    if (loading) return <div className="h-screen bg-slate-50 dark:bg-gray-950 flex items-center justify-center animate-pulse"></div>;
+    if (carousels.length === 0) return null;
 
     return (
         <section id="home" className="relative overflow-hidden bg-white dark:bg-gray-950 pt-[5rem]">
             {/* Full-Width Carousel at Top */}
             <div className="relative w-full aspect-video md:aspect-auto md:h-[calc(100vh-5rem)] overflow-hidden">
-                {carouselItems.map((item, index) => (
+                {carousels.map((item, index) => (
                     <div
-                        key={index}
+                        key={item.id}
                         className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === activeIndex ? "opacity-100 z-10" : "opacity-0 z-0"}`}
                         aria-hidden={index !== activeIndex}
                     >
-                        <img
-                            src={item.image}
-                            alt={item.alt}
-                            className="object-cover w-full h-full"
-                            loading={index === 0 ? "eager" : "lazy"}
-                            fetchPriority={index === 0 ? "high" : "low"}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent"></div>
+                        {item.link_url ? (
+                            <a href={item.link_url} target={item.link_target} rel={item.link_target === '_blank' ? "noopener noreferrer" : undefined}>
+                                <img
+                                    src={`${import.meta.env.VITE_API_URL}/storage/${item.image_path}`}
+                                    alt="แบนเนอร์วิทยาลัยเทคโนโลยีศรีราชา"
+                                    className="object-cover w-full h-full cursor-pointer hover:scale-105 transition-transform duration-[10s]"
+                                    loading={index === 0 ? "eager" : "lazy"}
+                                    fetchPriority={index === 0 ? "high" : "low"}
+                                    width="1920"
+                                    height="1080"
+                                    decoding="async"
+                                />
+                            </a>
+                        ) : (
+                            <img
+                                src={`${import.meta.env.VITE_API_URL}/storage/${item.image_path}`}
+                                alt="แบนเนอร์วิทยาลัยเทคโนโลยีศรีราชา"
+                                className="object-cover w-full h-full"
+                                loading={index === 0 ? "eager" : "lazy"}
+                                fetchPriority={index === 0 ? "high" : "low"}
+                                width="1920"
+                                height="1080"
+                                decoding="async"
+                            />
+                        )}
+                        {/* Blue-tinted Overlay */}
+                        <div className="absolute inset-0 bg-primary-900/10 mix-blend-multiply pointer-events-none"></div>
+                        <div className="absolute inset-0 bg-gradient-to-b from-primary-900/20 via-transparent to-white/10 dark:to-transparent pointer-events-none"></div>
                     </div>
                 ))}
 
                 {/* Controls */}
-                <button
-                    onClick={prevSlide}
-                    className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center hover:bg-white/40 transition-all z-20 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    aria-label="รูปภาพก่อนหน้า"
-                >
-                    <i className="fas fa-chevron-left" aria-hidden="true"></i>
-                </button>
-                <button
-                    onClick={nextSlide}
-                    className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center hover:bg-white/40 transition-all z-20 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    aria-label="รูปภาพถัดไป"
-                >
-                    <i className="fas fa-chevron-right" aria-hidden="true"></i>
-                </button>
-
-                {/* Indicators */}
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-3 z-20" role="tablist">
-                    {carouselItems.map((_, index) => (
+                {carousels.length > 1 && (
+                    <>
                         <button
-                            key={index}
-                            onClick={() => setActiveIndex(index)}
-                            role="tab"
-                            aria-selected={index === activeIndex}
-                            aria-label={`ไปยังสไลด์ที่ ${index + 1}`}
-                            className={`h-1.5 rounded-full bg-white transition-all ${index === activeIndex ? "w-12" : "w-6 opacity-40"}`}
-                        ></button>
-                    ))}
-                </div>
+                            onClick={prevSlide}
+                            className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center hover:bg-white/40 transition-all z-20 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            aria-label="รูปภาพก่อนหน้า"
+                        >
+                            <i className="fas fa-chevron-left" aria-hidden="true"></i>
+                        </button>
+                        <button
+                            onClick={nextSlide}
+                            className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center hover:bg-white/40 transition-all z-20 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            aria-label="รูปภาพถัดไป"
+                        >
+                            <i className="fas fa-chevron-right" aria-hidden="true"></i>
+                        </button>
+
+                        {/* Indicators */}
+                        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-3 z-20" role="tablist">
+                            {carousels.map((_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => setActiveIndex(index)}
+                                    role="tab"
+                                    aria-selected={index === activeIndex}
+                                    aria-label={`ไปยังสไลด์ที่ ${index + 1}`}
+                                    className={`h-1.5 rounded-full bg-white transition-all ${index === activeIndex ? "w-12" : "w-6 opacity-40"}`}
+                                ></button>
+                            ))}
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* Creative Content Below Carousel */}
@@ -96,7 +163,7 @@ export default function Hero() {
                     <div className="grid lg:grid-cols-12 gap-12 items-end">
                         <div className="lg:col-span-8">
                             <Reveal animation="fade-up" duration={1.2}>
-                                <span className="text-primary-500 font-black tracking-[0.3em] uppercase text-sm mb-6 block">
+                                <span className="text-primary-700 font-black tracking-[0.3em] uppercase text-sm mb-6 block">
                                     เปิดโอกาศใหม่ ๆ ในการเรียนรู้และพัฒนาทักษะของคุณ
                                 </span>
                                 <h1 className="kinetic-text uppercase mb-10 leading-[0.9] dark:text-white">
@@ -107,15 +174,20 @@ export default function Hero() {
                         </div>
                         <div className="lg:col-span-4 pb-4">
                             <Reveal animation="fade-up" delay={0.4} duration={1.2}>
-                                <p className="text-xl text-gray-700 dark:text-gray-300 leading-relaxed mb-8 border-l-4 border-primary-600 pl-6 font-medium">
-                                    มุ่งเน้นความเป็นเลิศทางนวัตกรรมและเทคโนโลยี
-                                    สร้างความพร้อมให้นักศึกษาสู่ตลาดแรงงานระดับสากล
-                                </p>
-                                <div className="flex items-center space-x-6">
-                                    <a href="#enroll" className="w-16 h-16 bg-black dark:bg-white dark:text-black text-white rounded-full grid place-items-center hover:scale-110 transition-transform shadow-2xl" aria-label="เลื่อนลงดูข้อมูลเพิ่มเติม">
-                                        <i className="fas fa-arrow-down text-xl animate-bounce" aria-hidden="true"></i>
-                                    </a>
-                                    <span className="font-bold text-gray-500 dark:text-gray-400">สนใจสมัครเรียนกับเรา</span>
+                                <div className="flex flex-col items-center text-center">
+                                    <div className="mb-8">
+                                        <img src="/logo_sriracha.png" alt="ตราวิทยาลัยเทคโนโลยีศรีราชา" className="h-40 md:h-48 w-auto object-contain drop-shadow-2xl" />
+                                    </div>
+                                    <p className="text-xl text-gray-700 dark:text-gray-300 leading-relaxed mb-10 font-medium max-w-sm">
+                                        มุ่งเน้นความเป็นเลิศทางนวัตกรรมและเทคโนโลยี
+                                        สร้างความพร้อมให้นักศึกษาสู่ตลาดแรงงานระดับสากล
+                                    </p>
+                                    <div className="flex flex-col items-center space-y-4">
+                                        <a href="#enroll" className="w-16 h-16 bg-black dark:bg-white dark:text-black text-white rounded-full grid place-items-center hover:scale-110 transition-transform shadow-2xl" aria-label="เลื่อนลงดูข้อมูลเพิ่มเติม">
+                                            <i className="fas fa-arrow-down text-xl animate-bounce" aria-hidden="true"></i>
+                                        </a>
+                                        <span className="font-bold text-gray-500 dark:text-gray-400">สนใจสมัครเรียนกับเรา</span>
+                                    </div>
                                 </div>
                             </Reveal>
                         </div>

@@ -7,10 +7,12 @@ export default function AdminLayout() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [user, setUser] = useState<any>(null);
+    const [mounted, setMounted] = useState(false); // เพิ่มเพื่อแก้ Hydration Error
     const location = useLocation();
     const navigate = useNavigate();
 
     useEffect(() => {
+        setMounted(true);
         const token = localStorage.getItem("admin_token");
         const savedUser = localStorage.getItem("admin_user");
 
@@ -27,7 +29,7 @@ export default function AdminLayout() {
     const handleLogout = async () => {
         const token = localStorage.getItem("admin_token");
         try {
-            await fetch("http://localhost:8000/api/logout", {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/logout`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -46,13 +48,24 @@ export default function AdminLayout() {
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
     const menuItems = [
-        { title: "Dashboard", path: "/admin", icon: "fas fa-tachometer-alt" },
-        { title: "จัดการผู้ใช้งาน", path: "/admin/users", icon: "fas fa-user-shield" },
-        { title: "จัดการหลักสูตร", path: "/admin/programs", icon: "fas fa-graduation-cap" },
-        { title: "จัดการบุคลากร", path: "/admin/staff", icon: "fas fa-users" },
-        { title: "จัดการข่าวสาร", path: "/admin/news", icon: "fas fa-newspaper" },
-        { title: "การตั้งค่า", path: "/admin/settings", icon: "fas fa-cogs" },
+        { title: "แดชบอร์ด", path: "/admin", icon: "fas fa-tachometer-alt" },
+        { title: "ข่าวสาร", path: "/admin/news", icon: "fas fa-newspaper" },
+        { title: "ภาพสไลด์", path: "/admin/carousel", icon: "fas fa-images" },
+        { title: "หลักสูตร", path: "/admin/curricula", icon: "fas fa-book-open" },
+        { title: "บุคลากร", path: "/admin/personnel", icon: "fas fa-users" },
+        { title: "สมัครงาน", path: "/admin/jobs", icon: "fas fa-briefcase" },
+        { title: "ผู้ใช้งาน", path: "/admin/users", icon: "fas fa-user-shield" },
+        { title: "ตั้งค่า", path: "/admin/settings", icon: "fas fa-cogs" },
     ];
+
+    // ฟังก์ชันช่วยหาชื่อหน้าปัจจุบันแบบยืดหยุ่น
+    const getCurrentPageTitle = () => {
+        const item = menuItems.find(i =>
+            location.pathname === i.path ||
+            (i.path !== '/admin' && location.pathname.startsWith(i.path))
+        );
+        return item ? item.title : "Dashboard";
+    };
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100">
@@ -78,7 +91,7 @@ export default function AdminLayout() {
                             <li key={item.path}>
                                 <NavLink
                                     to={item.path}
-                                    end
+                                    end={item.path === '/admin'}
                                     className={({ isActive }) =>
                                         `flex items-center p-3 rounded-md group transition-all ${isActive
                                             ? "bg-slate-800 text-primary-400 border-l-4 border-primary-500"
@@ -86,7 +99,7 @@ export default function AdminLayout() {
                                         }`
                                     }
                                 >
-                                    <i className={`${item.icon} text-base w-6 flex justify-center ${location.pathname === item.path ? "text-primary-400" : "text-slate-500"}`}></i>
+                                    <i className={`${item.icon} text-base w-6 flex justify-center ${location.pathname.startsWith(item.path) && (item.path !== '/admin' || location.pathname === '/admin') ? "text-primary-400" : "text-slate-500"}`}></i>
                                     {isSidebarOpen && <span className="ms-3">{item.title}</span>}
                                 </NavLink>
                             </li>
@@ -100,7 +113,7 @@ export default function AdminLayout() {
                             className="flex items-center w-full p-3 text-slate-400 rounded-md hover:bg-slate-800 hover:text-red-400 transition-all text-sm font-bold border border-slate-800"
                         >
                             <i className="fas fa-sign-out-alt text-base w-6 flex justify-center"></i>
-                            {isSidebarOpen && <span className="ms-3">Sign Out</span>}
+                            {isSidebarOpen && <span className="ms-3">ออกจากระบบ</span>}
                         </button>
                     </div>
                 </div>
@@ -119,31 +132,16 @@ export default function AdminLayout() {
                                 <i className={`fas ${isSidebarOpen ? "fa-indent" : "fa-outdent"}`}></i>
                             </button>
 
-                            {/* Breadcrumbs */}
+                            {/* Breadcrumbs - ใช้ mounted check เพื่อป้องกัน Hydration Error */}
                             <div className="hidden md:flex items-center text-xs font-medium text-slate-400 space-x-2">
-                                <Link to="/admin" className="hover:text-primary-500 uppercase tracking-widest">Admin</Link>
+                                <Link to="/admin" className="hover:text-primary-500 uppercase tracking-widest">BACKOFFICE</Link>
                                 <i className="fas fa-chevron-right text-[10px]"></i>
                                 <span className="text-slate-600 dark:text-slate-300 uppercase tracking-widest font-bold">
-                                    {menuItems.find(i => i.path === location.pathname)?.title || "Dashboard"}
+                                    {mounted ? getCurrentPageTitle() : "Dashboard"}
                                 </span>
                             </div>
                         </div>
 
-                        <div className="flex items-center space-x-6">
-                            <div className="hidden sm:flex flex-col items-end mr-2">
-                                <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{user?.name || "Administrator"}</span>
-                                <span className="text-[10px] text-green-500 font-bold uppercase flex items-center">
-                                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span> Online
-                                </span>
-                            </div>
-                            <button className="relative p-2 text-slate-400 hover:text-primary-500 transition-colors">
-                                <i className="far fa-bell text-xl"></i>
-                                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
-                            </button>
-                            <div className="h-10 w-10 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300">
-                                <i className="fas fa-user"></i>
-                            </div>
-                        </div>
                     </div>
                 </nav>
 
@@ -155,7 +153,6 @@ export default function AdminLayout() {
                 {/* Footer */}
                 <footer className="px-8 py-6 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500">
                     <div>&copy; 2026 <strong>Sriracha Technological College</strong>. All rights reserved.</div>
-                    <div className="mt-2 md:mt-0 font-medium">Version 1.0.0 (Production)</div>
                 </footer>
             </div>
         </div>

@@ -4,62 +4,143 @@ namespace App\Http\Controllers;
 
 use App\Models\News;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class NewsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return News::where('status', 'published')
+            ->orderBy('published_at', 'desc')
+            ->get();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function adminIndex()
     {
-        //
+        return News::with('author:id,name')
+            ->orderBy('created_at', 'desc')
+            ->get();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function showBySlug($slug)
+    {
+        $news = News::where('slug', $slug)->firstOrFail();
+        return response()->json($news);
+    }
+
+    public function show($id)
+    {
+        return News::findOrFail($id);
+    }
+
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'slug' => 'nullable|string|unique:news,slug',
+            'content' => 'required|string',
+            'status' => 'required|in:draft,published',
+            'published_at' => 'nullable|date',
+            'featured_image' => 'nullable|image|max:10240',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string',
+            'meta_keywords' => 'nullable|string',
+        ]);
+
+        if (empty($validated['slug'])) {
+            $validated['slug'] = Str::slug($validated['title']) . '-' . time();
+        }
+
+        $validated['author_id'] = $request->user()->id;
+
+        // Default published_at if published but no date provided
+        if ($validated['status'] === 'published' && empty($validated['published_at'])) {
+            $validated['published_at'] = now();
+        }
+
+        if ($request->hasFile('featured_image')) {
+            $validated['featured_image'] = $this->uploadAndConvert($request->file('featured_image'));
+        }
+
+        $news = News::create($validated);
+        return response()->json($news, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(News $news)
+    public function update(Request $request, $id)
     {
-        //
+        $news = News::findOrFail($id);
+        
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'slug' => 'required|string|unique:news,slug,' . $id,
+            'content' => 'required|string',
+            'status' => 'required|in:draft,published',
+            'published_at' => 'nullable|date',
+            'featured_image' => 'nullable|image|max:10240',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string',
+            'meta_keywords' => 'nullable|string',
+        ]);
+
+        if ($validated['status'] === 'published' && empty($validated['published_at']) && !$news->published_at) {
+            $validated['published_at'] = now();
+        }
+
+        if ($request->hasFile('featured_image')) {
+            if ($news->featured_image) {
+                Storage::disk('public')->delete($news->featured_image);
+            }
+            $validated['featured_image'] = $this->uploadAndConvert($request->file('featured_image'));
+        }
+
+        $news->update($validated);
+        return response()->json($news);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(News $news)
+    public function destroy($id)
     {
-        //
+        $news = News::findOrFail($id);
+        if ($news->featured_image) {
+            Storage::disk('public')->delete($news->featured_image);
+        }
+        $news->delete();
+        return response()->json(null, 204);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, News $news)
+    public function uploadImage(Request $request)
     {
-        //
+        $request->validate(['image' => 'required|image|max:5120']);
+        $path = $this->uploadAndConvert($request->file('image'));
+        return response()->json(['url' => 'http://localhost:8000/storage/' . $path]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(News $news)
+    private function uploadAndConvert($file)
     {
-        //
+        $extension = $file->getClientOriginalExtension();
+        $filename = time() . '_' . Str::random(10) . '.webp';
+        $tempPath = $file->getRealPath();
+        
+        // Native GD conversion to WebP
+        $image = null;
+        if ($extension === 'jpg' || $extension === 'jpeg') {
+            $image = imagecreatefromjpeg($tempPath);
+        } elseif ($extension === 'png') {
+            $image = imagecreatefrompng($tempPath);
+        } elseif ($extension === 'webp') {
+            $image = imagecreatefromwebp($tempPath);
+        }
+
+        if ($image) {
+            $storagePath = storage_path('app/public/news/' . $filename);
+            if (!file_exists(dirname($storagePath))) {
+                mkdir(dirname($storagePath), 0755, true);
+            }
+            imagewebp($image, $storagePath, 80);
+            imagedestroy($image);
+            return 'news/' . $filename;
+        }
+
+        return $file->store('news', 'public');
     }
 }

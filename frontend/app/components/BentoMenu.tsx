@@ -1,6 +1,12 @@
+import { NavLink } from "react-router";
 import Reveal from "./Reveal";
+import { useSettings } from "../hooks/useSettings";
 
 export default function BentoMenu() {
+    const { settings } = useSettings();
+
+    const enrollmentUrl = settings.enrollment_link || "https://admission.technosri.ac.th";
+
     return (
         <section className="bg-primary-900 py-32 relative overflow-hidden">
             <Reveal animation="reveal" className="relative z-10">
@@ -12,19 +18,18 @@ export default function BentoMenu() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                         {/* Large Item */}
                         <Reveal animation="zoom-in" className="col-span-2 row-span-1 md:row-span-2">
-                            <a href="#enroll" className="bento-card min-h-[400px] h-full rounded-2xl relative overflow-hidden group block">
-                                <img src="https://images.unsplash.com/photo-1523240915679-7f2171db6b0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Enroll" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                            <a href={enrollmentUrl} target="_blank" rel="noopener noreferrer" className="bento-card min-h-[400px] h-full rounded-2xl relative overflow-hidden group block" aria-label="สมัครเรียนออนไลน์">
+                                <img src="/images/img-2.jpg" alt="Enroll" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" width="800" height="400" loading="lazy" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-primary-900/90 via-primary-700/40 to-primary-400/20"></div>
                                 <div className="relative z-10 p-10 h-full flex flex-col justify-between">
                                     <div className="flex justify-between items-start">
                                         <div className="w-16 h-16 bg-white/20 backdrop-blur-md text-white rounded-2xl flex items-center justify-center text-3xl">
-                                            <i className="fas fa-user-plus"></i>
+                                            <i className="fas fa-user-plus" aria-hidden="true"></i>
                                         </div>
-                                        <i className="fas fa-external-link-alt text-white/50 group-hover:text-white transition-colors text-2xl"></i>
+                                        <i className="fas fa-external-link-alt text-white/50 group-hover:text-white transition-colors text-2xl" aria-hidden="true"></i>
                                     </div>
                                     <div className="text-white">
-                                        <h3 className="text-4xl font-black mb-4 uppercase">สมัครเรียน</h3>
-                                        <p className="text-white/80 max-w-xs font-medium">เริ่มต้นการเรียนรู้สู่ความสำเร็จ ลงทะเบียนเพื่อรับข้อมูลและสิทธิพิเศษปีการศึกษา 2568</p>
+                                        <h2 className="text-4xl font-black mb-4 uppercase">สมัครเรียน</h2>
                                     </div>
                                 </div>
                             </a>
@@ -32,49 +37,48 @@ export default function BentoMenu() {
 
                         {/* Square Items */}
                         <Reveal animation="zoom-in" delay={0.2}>
-                            <a href="#programs" className="bento-card min-h-[200px] h-full rounded-2xl relative overflow-hidden group block">
-                                <img src="https://images.unsplash.com/photo-1513258496099-48168024aec0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Programs" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                            <NavLink to="/programs" className="bento-card min-h-[200px] h-full rounded-2xl relative overflow-hidden group block" aria-label="ดูหลักสูตรที่เปิดสอน">
+                                <img src="/images/img-5.jpg" alt="Programs" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" width="400" height="200" loading="lazy" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-primary-900/90 via-primary-700/40 to-primary-400/20"></div>
-                                <div className="relative z-10 p-8 h-full flex flex-col items-center justify-center text-center">
+                                <div className="relative z-10 p-8 h-full flex flex-col items-start justify-top text-center">
                                     <div className="w-12 h-12 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center text-xl mb-4">
-                                        <i className="fas fa-graduation-cap"></i>
+                                        <i className="fas fa-graduation-cap" aria-hidden="true"></i>
                                     </div>
                                     <span className="font-black text-xl text-white uppercase">หลักสูตร</span>
                                 </div>
-                            </a>
+                            </NavLink>
                         </Reveal>
 
                         <Reveal animation="zoom-in" delay={0.3}>
-                            <a href="#news" className="bento-card min-h-[200px] h-full rounded-2xl relative overflow-hidden group block">
-                                <img src="https://images.unsplash.com/photo-1504711432869-5d39a160f4ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="News" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                            <NavLink to="/news" className="bento-card min-h-[200px] h-full rounded-2xl relative overflow-hidden group block" aria-label="ติดตามข่าวสารล่าสุด">
+                                <img src="/images/img-3.jpg" alt="News" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" width="400" height="200" loading="lazy" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-primary-900/90 via-primary-700/40 to-primary-400/20"></div>
-                                <div className="relative z-10 p-8 h-full flex flex-col items-center justify-center text-center">
+                                <div className="relative z-10 p-8 h-full flex flex-col items-start justify-top text-center">
                                     <div className="w-12 h-12 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center text-xl mb-4">
-                                        <i className="fas fa-newspaper"></i>
+                                        <i className="fas fa-newspaper" aria-hidden="true"></i>
                                     </div>
                                     <span className="font-black text-xl text-white uppercase">ข่าวสาร</span>
                                 </div>
-                            </a>
+                            </NavLink>
                         </Reveal>
 
                         {/* Wide Item */}
                         <Reveal animation="zoom-in" delay={0.4} className="col-span-2">
-                            <a href="#contact" className="bento-card rounded-2xl relative overflow-hidden group block">
-                                <img src="https://images.unsplash.com/photo-1534536281715-e28d76689b4d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Contact" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                            <NavLink to="/contact" className="bento-card min-h-[240px] rounded-2xl relative overflow-hidden group block" aria-label="ติดต่อสถาบัน">
+                                <img src="/images/img-4.jpg" alt="Contact" className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-1000" width="800" height="240" loading="lazy" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-primary-900/90 via-primary-700/40 to-primary-400/20"></div>
                                 <div className="relative z-10 p-8 flex items-center justify-between">
                                     <div className="flex items-center space-x-6 text-white">
                                         <div className="w-12 h-12 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center text-xl">
-                                            <i className="fas fa-comments"></i>
+                                            <i className="fas fa-comments" aria-hidden="true"></i>
                                         </div>
                                         <div>
-                                            <h4 className="font-black text-xl uppercase">ติดต่อเรา</h4>
-                                            <p className="text-white/70 text-sm">เราพร้อมให้คำปรึกษาตลอด 24 ชม.</p>
+                                            <h3 className="font-black text-xl uppercase">ติดต่อเรา</h3>
                                         </div>
                                     </div>
-                                    <i className="fas fa-chevron-right text-white/50 group-hover:text-white transition-all group-hover:translate-x-2"></i>
+                                    <i className="fas fa-chevron-right text-white/50 group-hover:text-white transition-all group-hover:translate-x-2" aria-hidden="true"></i>
                                 </div>
-                            </a>
+                            </NavLink>
                         </Reveal>
                     </div>
                 </div>

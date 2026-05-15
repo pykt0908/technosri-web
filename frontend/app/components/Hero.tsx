@@ -74,7 +74,7 @@ export default function Hero({ initialData = [] }: { initialData?: CarouselItem[
     return (
         <section id="home" className="relative overflow-hidden bg-white dark:bg-gray-950 pt-[5rem]">
             {/* Full-Width Carousel at Top */}
-            <div className="relative w-full aspect-video md:aspect-auto md:h-[calc(100vh-5rem)] overflow-hidden">
+            <div className="relative w-full aspect-[2048/836] overflow-hidden shadow-2xl">
                 {carousels.map((item, index) => (
                     <div
                         key={item.id}

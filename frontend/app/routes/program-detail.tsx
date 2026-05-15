@@ -109,7 +109,7 @@ export default function ProgramDetail() {
 
                     {/* Featured Image */}
                     <Reveal delay={0.2}>
-                        <div className="aspect-[21/9] rounded-3xl overflow-hidden bg-gray-100 dark:bg-gray-900 shadow-2xl border border-gray-100 dark:border-gray-800 relative">
+                        <div className="aspect-[16/9] rounded-3xl overflow-hidden bg-gray-100 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 relative">
                             {program.image ? (
                                 <img
                                     src={`${import.meta.env.VITE_API_URL}/storage/${program.image}`}

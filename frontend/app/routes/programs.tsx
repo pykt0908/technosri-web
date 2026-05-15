@@ -87,7 +87,7 @@ export default function Programs() {
                             filteredData.map((item, index) => (
                                 <Reveal key={item.id} delay={index * 0.1}>
                                     <div className="group bg-white dark:bg-gray-900 rounded-[2.5rem] overflow-hidden border border-gray-100 dark:border-gray-800 hover:shadow-2xl hover:shadow-primary-500/10 transition-all duration-700 hover:-translate-y-4">
-                                        <div className="aspect-[4/3] overflow-hidden relative">
+                                        <div className="aspect-[16/9] relative overflow-hidden bg-slate-100 dark:bg-slate-800">
                                             {item.image ? (
                                                 <img
                                                     src={`${import.meta.env.VITE_API_URL}/storage/${item.image}`}

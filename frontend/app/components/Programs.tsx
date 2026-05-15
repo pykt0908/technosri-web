@@ -147,7 +147,7 @@ export default function Programs({ initialData = [] }: { initialData?: Curriculu
                                         style={{ width: `${100 / itemsPerView}%` }}
                                     >
                                         <div className="bg-white dark:bg-gray-900 rounded-[2.5rem] h-full overflow-hidden group border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-700 flex flex-col">
-                                            <div className="h-[200px] relative overflow-hidden bg-slate-100 dark:bg-slate-800">
+                                            <div className="aspect-[16/9] relative overflow-hidden bg-slate-100 dark:bg-slate-800">
                                                 {item.image ? (
                                                     <img
                                                         src={`${import.meta.env.VITE_API_URL}/storage/${item.image}`}

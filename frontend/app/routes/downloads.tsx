@@ -264,17 +264,17 @@ export default function DownloadsPage() {
                                                 {doc.files.map(file => {
                                                     const ext = file.file_path.split('.').pop()?.toLowerCase();
                                                     return (
-                                                        <button
+                                                                                        <button
                                                             key={file.id}
                                                             onClick={() => handleDownload(file.id)}
-                                                            className={`flex-1 md:flex-initial px-5 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center space-x-2 text-white shadow-lg active:scale-95 hover:scale-[1.02] cursor-pointer shrink-0 ${
+                                                            className={`flex-1 md:flex-initial px-5 py-3.5 rounded-2xl text-[11px] font-extrabold uppercase tracking-wider transition-all duration-300 flex items-center justify-center space-x-2 text-white shadow-xl active:scale-95 hover:scale-[1.02] cursor-pointer shrink-0 ${
                                                                 ext === 'pdf'
-                                                                    ? "bg-gradient-to-r from-red-650 to-red-500 hover:from-red-600 hover:to-rose-500 shadow-red-500/10 hover:shadow-red-500/20"
+                                                                    ? "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-lg shadow-red-500/25"
                                                                     : ['doc', 'docx'].includes(ext || '')
-                                                                    ? "bg-gradient-to-r from-blue-650 to-blue-500 hover:from-blue-600 hover:to-indigo-500 shadow-blue-500/10 hover:shadow-blue-500/20"
+                                                                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-500/25"
                                                                     : ['xls', 'xlsx'].includes(ext || '')
-                                                                    ? "bg-gradient-to-r from-emerald-650 to-emerald-500 hover:from-emerald-600 hover:to-teal-500 shadow-emerald-500/10 hover:shadow-emerald-500/20"
-                                                                    : "bg-gradient-to-r from-slate-700 to-slate-800 hover:from-primary-600 hover:to-primary-700 shadow-slate-500/10 hover:shadow-primary-500/20"
+                                                                    ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-500/25"
+                                                                    : "bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 shadow-lg shadow-slate-550/20"
                                                             }`}
                                                             title={`${file.title} • ดาวน์โหลด ${file.download_count} ครั้ง`}
                                                         >

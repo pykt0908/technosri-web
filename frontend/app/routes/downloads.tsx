@@ -50,7 +50,7 @@ export default function DownloadsPage() {
     const [categories, setCategories] = useState<CategoryItem[]>([]);
     const [currentCategory, setCurrentCategory] = useState<CategoryItem | null>(null);
     const [documents, setDocuments] = useState<DownloadDocumentItem[]>([]);
-    
+
     const [loadingCategories, setLoadingCategories] = useState(true);
     const [loadingFiles, setLoadingFiles] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
@@ -64,7 +64,7 @@ export default function DownloadsPage() {
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/api/downloads/categories`);
                 const data = await res.json();
                 setCategories(data);
-                
+
                 if (data.length > 0) {
                     // If no slug is specified in the route, default to first category
                     if (!slug) {
@@ -138,19 +138,19 @@ export default function DownloadsPage() {
     const handleDownload = (fileId: number) => {
         // Trigger download counter and file stream via window open/download
         window.open(`${import.meta.env.VITE_API_URL}/api/downloads/files/${fileId}/download`, '_blank');
-        
+
         // Optimistically increment local counter so UI feels instant
-        setDocuments(prevDocs => 
+        setDocuments(prevDocs =>
             prevDocs.map(doc => ({
                 ...doc,
-                files: doc.files.map(f => 
+                files: doc.files.map(f =>
                     f.id === fileId ? { ...f, download_count: f.download_count + 1 } : f
                 )
             }))
         );
     };
 
-    const filteredDocuments = documents.filter(doc => 
+    const filteredDocuments = documents.filter(doc =>
         doc.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -176,7 +176,7 @@ export default function DownloadsPage() {
             <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary-500/5 rounded-full blur-[150px] -z-10"></div>
 
             <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
-                
+
                 {/* Header */}
                 <header className="mb-16">
                     <Reveal>
@@ -186,23 +186,20 @@ export default function DownloadsPage() {
                         </div>
                         <h1 className="text-5xl md:text-7xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight uppercase mb-6">
                             เอกสารดาวน์โหลด <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-blue-500">และแบบฟอร์มต่างๆ</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-blue-500">และแบบฟอร์มต่าง ๆ</span>
                         </h1>
-                        <p className="text-slate-500 dark:text-slate-400 max-w-3xl text-lg leading-relaxed">
-                            รวบรวมเอกสาร แบบฟอร์มต่างๆ และสื่อการเรียนการสอนสำหรับการดาวน์โหลดใช้งานอย่างเป็นทางการ
-                        </p>
                     </Reveal>
                 </header>
 
                 {/* Main Content Layout */}
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-10 items-start">
-                    
+
                     {/* Left: Category Sidebar */}
                     <div className="lg:col-span-1 bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none sticky top-28">
                         <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider mb-6 pl-2">
                             หมวดหมู่เอกสาร
                         </h3>
-                        
+
                         {loadingCategories ? (
                             <div className="space-y-3">
                                 {[1, 2, 3].map(i => (
@@ -244,8 +241,8 @@ export default function DownloadsPage() {
                                                     navigate(`/downloads/${cat.slug}`);
                                                 }}
                                                 className={`flex items-center justify-between px-5 py-4 rounded-2xl text-sm font-black transition-all duration-300 w-full text-left group ${isActive
-                                                        ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-500/20"
-                                                        : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-primary-600 dark:hover:text-primary-400"
+                                                    ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-500/20"
+                                                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-primary-600 dark:hover:text-primary-400"
                                                     }`}
                                             >
                                                 <span>{cat.name}</span>
@@ -270,13 +267,13 @@ export default function DownloadsPage() {
 
                     {/* Right: Documents List & Search */}
                     <div className="lg:col-span-3 space-y-8">
-                        
+
                         {/* Search bar inside selected category */}
                         <div className="relative group">
                             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" size={20} />
-                            <input 
-                                type="text" 
-                                placeholder={currentCategory ? `ค้นหาเอกสารในหมวดหมู่ "${currentCategory.name}"...` : "ค้นหาเอกสารดาวน์โหลด..."} 
+                            <input
+                                type="text"
+                                placeholder={currentCategory ? `ค้นหาเอกสารในหมวดหมู่ "${currentCategory.name}"...` : "ค้นหาเอกสารดาวน์โหลด..."}
                                 value={searchTerm}
                                 onChange={(e) => {
                                     setSearchTerm(e.target.value);
@@ -298,7 +295,7 @@ export default function DownloadsPage() {
                                 {paginatedDocuments.map((doc, index) => (
                                     <Reveal key={doc.id} delay={index * 0.05}>
                                         <div className="group bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 hover:shadow-2xl hover:shadow-primary-500/5 dark:hover:shadow-none transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                                            
+
                                             {/* Left: Icon & Document Title */}
                                             <div className="flex items-center space-x-4 min-w-0 flex-1">
                                                 <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:scale-105 transition-transform duration-300 shrink-0 flex items-center justify-center">
@@ -323,17 +320,16 @@ export default function DownloadsPage() {
                                                         <button
                                                             key={file.id}
                                                             onClick={() => handleDownload(file.id)}
-                                                            className={`flex-1 md:flex-initial px-5 py-3.5 rounded-2xl text-[11px] font-extrabold uppercase tracking-wider transition-all duration-300 flex items-center justify-center space-x-2 text-white shadow-xl active:scale-95 hover:scale-[1.02] cursor-pointer shrink-0 ${
-                                                                ext === 'pdf'
+                                                            className={`flex-1 md:flex-initial px-5 py-3.5 rounded-2xl text-[11px] font-extrabold uppercase tracking-wider transition-all duration-300 flex items-center justify-center space-x-2 text-white shadow-xl active:scale-95 hover:scale-[1.02] cursor-pointer shrink-0 ${ext === 'pdf'
                                                                     ? "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-lg shadow-red-500/25"
                                                                     : ['doc', 'docx'].includes(ext || '')
-                                                                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-500/25"
-                                                                    : ['xls', 'xlsx'].includes(ext || '')
-                                                                    ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-500/25"
-                                                                    : ['mp3', 'wav', 'ogg', 'm4a', 'aac'].includes(ext || '')
-                                                                    ? "bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 shadow-lg shadow-violet-500/25"
-                                                                    : "bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 shadow-lg shadow-slate-500/20"
-                                                            }`}
+                                                                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-500/25"
+                                                                        : ['xls', 'xlsx'].includes(ext || '')
+                                                                            ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-500/25"
+                                                                            : ['mp3', 'wav', 'ogg', 'm4a', 'aac'].includes(ext || '')
+                                                                                ? "bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 shadow-lg shadow-violet-500/25"
+                                                                                : "bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 shadow-lg shadow-slate-500/20"
+                                                                }`}
                                                             title={`${file.title} • ดาวน์โหลด ${file.download_count} ครั้ง`}
                                                         >
                                                             <Download size={12} />
@@ -369,11 +365,10 @@ export default function DownloadsPage() {
                                                 <button
                                                     key={pageNum}
                                                     onClick={() => setCurrentPage(pageNum)}
-                                                    className={`w-11 h-11 rounded-2xl text-xs font-black transition-all duration-300 shadow-sm cursor-pointer ${
-                                                        isActive
+                                                    className={`w-11 h-11 rounded-2xl text-xs font-black transition-all duration-300 shadow-sm cursor-pointer ${isActive
                                                             ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md shadow-primary-500/20 scale-105"
                                                             : "bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:scale-[1.02]"
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {pageNum}
                                                 </button>

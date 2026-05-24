@@ -36,8 +36,25 @@ try {
     $autoloadPath = __DIR__.'/../vendor/autoload.php';
     $appPath = __DIR__.'/../bootstrap/app.php';
 
+    // DYNAMIC AUTODETECT: If standard paths do not exist, parse adjacent index.php to discover custom paths
     if (!file_exists($autoloadPath) || !file_exists($appPath)) {
-        throw new \Exception("ไม่พบโครงสร้างระบบของ Laravel กรุณาตรวจสอบว่าคุณได้ทำการติดตั้ง vendor เรียบร้อยแล้ว (อ้างอิงตำแหน่ง: " . dirname($autoloadPath) . ")");
+        $indexContent = @file_get_contents(__DIR__.'/index.php');
+        if ($indexContent) {
+            // Find autoload path
+            if (preg_match("/require\s+(['\"])(.*?\/vendor\/autoload\.php)\\1/", $indexContent, $matches)) {
+                $rawPath = $matches[2];
+                $autoloadPath = str_replace('__DIR__', __DIR__, $rawPath);
+            }
+            // Find app path
+            if (preg_match("/(?:require|require_once)\s*\(*\s*(['\"])(.*?\/bootstrap\/app\.php)\\1\s*\)*/i", $indexContent, $matches)) {
+                $rawPath = $matches[2];
+                $appPath = str_replace('__DIR__', __DIR__, $rawPath);
+            }
+        }
+    }
+
+    if (!file_exists($autoloadPath) || !file_exists($appPath)) {
+        throw new \Exception("ไม่พบโครงสร้างระบบของ Laravel กรุณาตรวจสอบว่าคุณได้ทำการติดตั้ง vendor เรียบร้อยแล้ว (ตรวจสอบตำแหน่ง Autoload: " . $autoloadPath . " | Bootstrap: " . $appPath . ")");
     }
 
     require $autoloadPath;

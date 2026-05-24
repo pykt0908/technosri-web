@@ -24,8 +24,11 @@ class DownloadCategoryController extends Controller
     }
 
     // Public: show category by ID
-    public function show(DownloadCategory $category)
+    public function show($category)
     {
+        if (!$category instanceof DownloadCategory) {
+            $category = DownloadCategory::findOrFail($category);
+        }
         $category->load('documents.files');
         return response()->json($category);
     }
@@ -59,8 +62,11 @@ class DownloadCategoryController extends Controller
     }
 
     // Admin: update category
-    public function update(Request $request, DownloadCategory $category)
+    public function update(Request $request, $category)
     {
+        if (!$category instanceof DownloadCategory) {
+            $category = DownloadCategory::findOrFail($category);
+        }
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:download_categories,slug,' . $category->id,
@@ -72,8 +78,11 @@ class DownloadCategoryController extends Controller
     }
 
     // Admin: delete category (will cascade delete files, but we also want to clean up storage!)
-    public function destroy(DownloadCategory $category)
+    public function destroy($category)
     {
+        if (!$category instanceof DownloadCategory) {
+            $category = DownloadCategory::findOrFail($category);
+        }
         $documents = $category->documents;
         foreach ($documents as $doc) {
             $files = $doc->files;

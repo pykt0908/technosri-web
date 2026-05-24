@@ -178,6 +178,20 @@ try {
               </div>";
     }
 
+    // 6. Columns listing for download_files (Diagnostics)
+    echo "<h2>5. รายชื่อคอลัมน์ในตาราง download_files (Diagnostics)</h2>";
+    if (Illuminate\Support\Facades\Schema::hasTable('download_files')) {
+        $columns = Illuminate\Support\Facades\Schema::getColumnListing('download_files');
+        echo "<div class='card info-box' style='background-color: #f8fafc; border-color: #cbd5e1; margin-bottom: 20px;'>
+                <strong>คอลัมน์ปัจจุบันในตาราง <code>download_files</code> บนโฮสติ้ง:</strong>
+                <pre style='background-color: #f1f5f9; color: #0f172a; padding: 15px; border-radius: 6px; border: 1px dashed #cbd5e1; font-family: monospace; font-size: 12px; margin-top: 10px;'>" . implode(", ", $columns) . "</pre>
+              </div>";
+    } else {
+        echo "<div class='card error'>
+                <strong>ข้อพึงระวัง:</strong> ไม่พบตาราง <code>download_files</code> เพื่อแจกแจงคอลัมน์
+              </div>";
+    }
+
 } catch (\Exception $e) {
     echo "<h2>เกิดข้อผิดพลาดระดับระบบ (Fatal System Error)</h2>";
     echo "<div class='card error'>

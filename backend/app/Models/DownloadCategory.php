@@ -17,8 +17,8 @@ class DownloadCategory extends Model
         'sort_order'
     ];
 
-    public function files()
+    public function documents()
     {
-        return $this->hasMany(DownloadFile::class, 'download_category_id')->orderBy('sort_order', 'asc');
+        return $this->hasMany(DownloadDocument::class, 'download_category_id')->orderBy('sort_order', 'asc');
     }
 }

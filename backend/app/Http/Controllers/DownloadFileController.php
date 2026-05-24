@@ -29,7 +29,7 @@ class DownloadFileController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'download_category_id' => 'required|exists:download_categories,id',
+            'download_document_id' => 'required|exists:download_documents,id',
             'title' => 'required|string|max:255',
             'file' => 'required|file|max:20480', // limit to 20MB
         ]);
@@ -46,7 +46,7 @@ class DownloadFileController extends Controller
             $validated['file_size'] = $friendlySize;
         }
 
-        $validated['sort_order'] = DownloadFile::where('download_category_id', $request->download_category_id)->max('sort_order') + 1;
+        $validated['sort_order'] = DownloadFile::where('download_document_id', $request->download_document_id)->max('sort_order') + 1;
         $validated['download_count'] = 0;
 
         return DownloadFile::create($validated);
@@ -58,7 +58,7 @@ class DownloadFileController extends Controller
         $file = DownloadFile::findOrFail($id);
 
         $validated = $request->validate([
-            'download_category_id' => 'required|exists:download_categories,id',
+            'download_document_id' => 'required|exists:download_documents,id',
             'title' => 'required|string|max:255',
             'file' => 'nullable|file|max:20480', // file is optional on update
         ]);

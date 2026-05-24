@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import * as Lucide from "lucide-react";
 import Reveal from "../components/Reveal";
 
@@ -16,11 +16,20 @@ const Calendar = Lucide.Calendar || Lucide.Clock;
 
 interface DownloadFileItem {
     id: number;
-    download_category_id: number;
+    download_document_id: number;
     title: string;
     file_path: string;
     file_size: string | null;
     download_count: number;
+    created_at: string;
+}
+
+interface DownloadDocumentItem {
+    id: number;
+    download_category_id: number;
+    title: string;
+    sort_order: number;
+    files: DownloadFileItem[];
     created_at: string;
 }
 
@@ -37,8 +46,8 @@ export default function DownloadsPage() {
 
     const [categories, setCategories] = useState<CategoryItem[]>([]);
     const [currentCategory, setCurrentCategory] = useState<CategoryItem | null>(null);
-    const [files, setFiles] = useState<DownloadFileItem[]>([]);
-
+    const [documents, setDocuments] = useState<DownloadDocumentItem[]>([]);
+    
     const [loadingCategories, setLoadingCategories] = useState(true);
     const [loadingFiles, setLoadingFiles] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
@@ -50,7 +59,7 @@ export default function DownloadsPage() {
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/api/downloads/categories`);
                 const data = await res.json();
                 setCategories(data);
-
+                
                 if (data.length > 0) {
                     // If no slug is specified in the route, default to first category
                     if (!slug) {
@@ -67,7 +76,7 @@ export default function DownloadsPage() {
         fetchCategories();
     }, [slug, navigate]);
 
-    // Fetch files when active category slug changes
+    // Fetch documents when active category slug changes
     useEffect(() => {
         if (!slug || categories.length === 0) return;
 
@@ -86,9 +95,9 @@ export default function DownloadsPage() {
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/downloads/categories/v/${categorySlug}`);
             const data = await res.json();
-            setFiles(data.files || []);
+            setDocuments(data.documents || []);
         } catch (err) {
-            console.error("Failed to fetch files for category", err);
+            console.error("Failed to fetch documents for category", err);
         } finally {
             setLoadingFiles(false);
         }
@@ -96,28 +105,31 @@ export default function DownloadsPage() {
 
     const getFileIcon = (filePath: string) => {
         const ext = filePath.split('.').pop()?.toLowerCase();
-        if (ext === 'pdf') return <FileText className="text-red-500 dark:text-red-400" size={32} />;
-        if (['doc', 'docx'].includes(ext || '')) return <FileText className="text-blue-500 dark:text-blue-400" size={32} />;
-        if (['xls', 'xlsx'].includes(ext || '')) return <FileSpreadsheet className="text-green-500 dark:text-green-400" size={32} />;
-        if (['zip', 'rar', '7z'].includes(ext || '')) return <Archive className="text-amber-500 dark:text-amber-400" size={32} />;
-        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')) return <FileImage className="text-purple-500 dark:text-purple-400" size={32} />;
-        return <DefaultFileIcon className="text-slate-400 dark:text-slate-500" size={32} />;
+        if (ext === 'pdf') return <FileText className="text-red-500 dark:text-red-400" size={18} />;
+        if (['doc', 'docx'].includes(ext || '')) return <FileText className="text-blue-500 dark:text-blue-400" size={18} />;
+        if (['xls', 'xlsx'].includes(ext || '')) return <FileSpreadsheet className="text-green-500 dark:text-green-400" size={18} />;
+        if (['zip', 'rar', '7z'].includes(ext || '')) return <Archive className="text-amber-500 dark:text-amber-400" size={18} />;
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')) return <FileImage className="text-purple-500 dark:text-purple-400" size={18} />;
+        return <DefaultFileIcon className="text-slate-400 dark:text-slate-500" size={18} />;
     };
 
     const handleDownload = (fileId: number) => {
         // Trigger download counter and file stream via window open/download
         window.open(`${import.meta.env.VITE_API_URL}/api/downloads/files/${fileId}/download`, '_blank');
-
+        
         // Optimistically increment local counter so UI feels instant
-        setFiles(prevFiles =>
-            prevFiles.map(f =>
-                f.id === fileId ? { ...f, download_count: f.download_count + 1 } : f
-            )
+        setDocuments(prevDocs => 
+            prevDocs.map(doc => ({
+                ...doc,
+                files: doc.files.map(f => 
+                    f.id === fileId ? { ...f, download_count: f.download_count + 1 } : f
+                )
+            }))
         );
     };
 
-    const filteredFiles = files.filter(file =>
-        file.title.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredDocuments = documents.filter(doc => 
+        doc.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const formatDate = (dateString: string) => {
@@ -135,7 +147,7 @@ export default function DownloadsPage() {
             <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary-500/5 rounded-full blur-[150px] -z-10"></div>
 
             <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
-
+                
                 {/* Header */}
                 <header className="mb-16">
                     <Reveal>
@@ -147,18 +159,21 @@ export default function DownloadsPage() {
                             เอกสารดาวน์โหลด <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-blue-500">และแบบฟอร์มต่างๆ</span>
                         </h1>
+                        <p className="text-slate-500 dark:text-slate-400 max-w-3xl text-lg leading-relaxed">
+                            รวบรวมเอกสาร แบบฟอร์มต่างๆ และสื่อการเรียนการสอนสำหรับการดาวน์โหลดใช้งานอย่างเป็นทางการ
+                        </p>
                     </Reveal>
                 </header>
 
                 {/* Main Content Layout */}
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-10 items-start">
-
+                    
                     {/* Left: Category Sidebar */}
                     <div className="lg:col-span-1 bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/40 dark:shadow-none sticky top-28">
                         <h3 className="text-sm font-black text-slate-400 uppercase tracking-wider mb-6 pl-2">
                             หมวดหมู่เอกสาร
                         </h3>
-
+                        
                         {loadingCategories ? (
                             <div className="space-y-3">
                                 {[1, 2, 3].map(i => (
@@ -200,75 +215,108 @@ export default function DownloadsPage() {
                         )}
                     </div>
 
-                    {/* Right: Files List & Search */}
+                    {/* Right: Documents List & Search */}
                     <div className="lg:col-span-3 space-y-8">
-
+                        
                         {/* Search bar inside selected category */}
                         <div className="relative group">
                             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" size={20} />
-                            <input
-                                type="text"
-                                placeholder={currentCategory ? `ค้นหาไฟล์ในหมวดหมู่ "${currentCategory.name}"...` : "ค้นหาไฟล์เอกสาร..."}
+                            <input 
+                                type="text" 
+                                placeholder={currentCategory ? `ค้นหาเอกสารในหมวดหมู่ "${currentCategory.name}"...` : "ค้นหาเอกสารดาวน์โหลด..."} 
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full pl-14 pr-6 py-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl shadow-xl shadow-slate-200/30 dark:shadow-none focus:ring-2 focus:ring-primary-500 outline-none transition-all text-sm font-bold text-slate-700 dark:text-white"
                             />
                         </div>
 
-                        {/* Files Loading or Display */}
+                        {/* Documents Loading or Display */}
                         {loadingFiles ? (
                             <div className="space-y-4">
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className="bg-white dark:bg-slate-900 rounded-[2rem] h-[100px] animate-pulse border border-slate-100 dark:border-slate-800 shadow-sm"></div>
+                                    <div key={i} className="bg-white dark:bg-slate-900 rounded-[2rem] h-[120px] animate-pulse border border-slate-100 dark:border-slate-800 shadow-sm"></div>
                                 ))}
                             </div>
                         ) : (
-                            <div className="space-y-4">
-                                {filteredFiles.map((file, index) => (
-                                    <Reveal key={file.id} delay={index * 0.05}>
-                                        <div className="group bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 hover:shadow-2xl hover:shadow-primary-500/5 dark:hover:shadow-none transition-all duration-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-
-                                            {/* Left: Icon & Details */}
-                                            <div className="flex items-start space-x-4 flex-1">
+                            <div className="space-y-6">
+                                {filteredDocuments.map((doc, index) => (
+                                    <Reveal key={doc.id} delay={index * 0.05}>
+                                        <div className="group bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 hover:shadow-2xl hover:shadow-primary-500/5 dark:hover:shadow-none transition-all duration-300 space-y-5">
+                                            
+                                            {/* Top: Icon & Document Title */}
+                                            <div className="flex items-start space-x-4">
                                                 <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:scale-105 transition-transform duration-300">
-                                                    {getFileIcon(file.file_path)}
+                                                    <Lucide.FileText className="text-primary-600 dark:text-primary-400" size={32} />
                                                 </div>
-                                                <div className="space-y-1">
-                                                    <h3 className="text-base font-black text-slate-800 dark:text-white leading-snug group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                                                        {file.title}
+                                                <div className="space-y-1.5 flex-1 min-w-0">
+                                                    <h3 className="text-lg font-black text-slate-850 dark:text-white leading-snug group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                                                        {doc.title}
                                                     </h3>
-                                                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-bold text-slate-400">
-                                                        {file.file_size && (
-                                                            <span className="bg-slate-50 dark:bg-slate-800 px-2.5 py-1 rounded-md text-[10px] text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-slate-700">
-                                                                {file.file_size}
-                                                            </span>
-                                                        )}
-                                                        <span className="flex items-center space-x-1.5">
-                                                            <Calendar size={12} className="opacity-80" />
-                                                            <span>{formatDate(file.created_at)}</span>
-                                                        </span>
-                                                        <span>
-                                                            ดาวน์โหลด: {file.download_count.toLocaleString()} ครั้ง
-                                                        </span>
+                                                    <div className="flex items-center text-xs font-bold text-slate-400 space-x-1.5">
+                                                        <Calendar size={12} className="opacity-80" />
+                                                        <span>{formatDate(doc.created_at)}</span>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            {/* Right: Download Button */}
-                                            <button
-                                                onClick={() => handleDownload(file.id)}
-                                                className="w-full sm:w-auto px-6 py-4 bg-slate-900 hover:bg-primary-600 dark:bg-slate-800 dark:hover:bg-primary-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center space-x-2 group-hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-slate-950/10 dark:shadow-none hover:shadow-primary-500/20"
-                                            >
-                                                <Download size={14} className="group-hover:translate-y-0.5 transition-transform" />
-                                                <span>ดาวน์โหลด</span>
-                                            </button>
+                                            {/* Bottom: Attachments / Files inside Document */}
+                                            <div className="pt-5 border-t border-slate-50 dark:border-slate-800/80">
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">ดาวน์โหลดรูปแบบเอกสาร:</p>
+                                                <div className="grid grid-cols-1 gap-3.5">
+                                                    {doc.files.map(file => {
+                                                        const ext = file.file_path.split('.').pop()?.toLowerCase();
+                                                        return (
+                                                            <div
+                                                                key={file.id}
+                                                                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-4.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/80 rounded-3xl hover:bg-slate-100/50 dark:hover:bg-slate-800/60 transition-all duration-300 group/file gap-4"
+                                                            >
+                                                                {/* Left: File details */}
+                                                                <div className="flex items-center space-x-3.5 min-w-0 flex-1">
+                                                                    <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl group-hover/file:scale-105 transition-transform duration-300 shrink-0 shadow-sm border border-slate-100/50 dark:border-slate-800/50">
+                                                                        {getFileIcon(file.file_path)}
+                                                                    </div>
+                                                                    <div className="min-w-0 flex-1">
+                                                                        <p className="font-bold text-sm text-slate-800 dark:text-slate-200 truncate group-hover/file:text-primary-600 dark:group-hover/file:text-primary-400 transition-colors">
+                                                                            {file.title}
+                                                                        </p>
+                                                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono mt-0.5 font-bold">
+                                                                            {file.file_size || "N/A"} • ดาวน์โหลด {file.download_count.toLocaleString()} ครั้ง
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Right: Download Button */}
+                                                                <button
+                                                                    onClick={() => handleDownload(file.id)}
+                                                                    className={`w-full sm:w-auto px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center space-x-2 text-white shadow-lg active:scale-95 hover:scale-[1.02] cursor-pointer shrink-0 ${
+                                                                        ext === 'pdf'
+                                                                            ? "bg-gradient-to-r from-red-650 to-red-500 hover:from-red-600 hover:to-rose-500 shadow-red-500/10 hover:shadow-red-500/20"
+                                                                            : ['doc', 'docx'].includes(ext || '')
+                                                                            ? "bg-gradient-to-r from-blue-650 to-blue-500 hover:from-blue-600 hover:to-indigo-500 shadow-blue-500/10 hover:shadow-blue-500/20"
+                                                                            : ['xls', 'xlsx'].includes(ext || '')
+                                                                            ? "bg-gradient-to-r from-emerald-650 to-emerald-500 hover:from-emerald-600 hover:to-teal-500 shadow-emerald-500/10 hover:shadow-emerald-500/20"
+                                                                            : "bg-gradient-to-r from-slate-700 to-slate-800 hover:from-primary-600 hover:to-primary-700 shadow-slate-500/10 hover:shadow-primary-500/20"
+                                                                    }`}
+                                                                >
+                                                                    <Download size={12} className="group-hover/file:translate-y-0.5 transition-transform" />
+                                                                    <span>ดาวน์โหลด</span>
+                                                                </button>
+                                                            </div>
+                                                        );
+                                                    })}
+
+                                                    {doc.files.length === 0 && (
+                                                        <span className="text-xs font-bold text-slate-400 italic block py-4">ยังไม่ได้อัปโหลดรูปแบบไฟล์แนบ</span>
+                                                    )}
+                                                </div>
+                                            </div>
 
                                         </div>
                                     </Reveal>
                                 ))}
 
                                 {/* Empty category files state */}
-                                {filteredFiles.length === 0 && (
+                                {filteredDocuments.length === 0 && (
                                     <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-md">
                                         <div className="text-slate-300 dark:text-slate-700 mb-4">
                                             <Lucide.File className="mx-auto" size={64} />

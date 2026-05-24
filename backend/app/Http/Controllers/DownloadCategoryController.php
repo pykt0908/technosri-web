@@ -19,14 +19,14 @@ class DownloadCategoryController extends Controller
     public function showBySlug($slug)
     {
         $category = DownloadCategory::where('slug', $slug)->firstOrFail();
-        $category->load('files');
+        $category->load('documents.files');
         return response()->json($category);
     }
 
     // Public: show category by ID
     public function show(DownloadCategory $category)
     {
-        $category->load('files');
+        $category->load('documents.files');
         return response()->json($category);
     }
 
@@ -74,10 +74,13 @@ class DownloadCategoryController extends Controller
     // Admin: delete category (will cascade delete files, but we also want to clean up storage!)
     public function destroy(DownloadCategory $category)
     {
-        $files = $category->files;
-        foreach ($files as $file) {
-            if ($file->file_path) {
-                Storage::disk('public')->delete($file->file_path);
+        $documents = $category->documents;
+        foreach ($documents as $doc) {
+            $files = $doc->files;
+            foreach ($files as $file) {
+                if ($file->file_path) {
+                    Storage::disk('public')->delete($file->file_path);
+                }
             }
         }
         

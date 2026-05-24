@@ -12,7 +12,7 @@ class DownloadFile extends Model
     protected $table = 'download_files';
 
     protected $fillable = [
-        'download_category_id',
+        'download_document_id',
         'title',
         'file_path',
         'file_size',
@@ -20,8 +20,8 @@ class DownloadFile extends Model
         'sort_order'
     ];
 
-    public function category()
+    public function document()
     {
-        return $this->belongsTo(DownloadCategory::class, 'download_category_id');
+        return $this->belongsTo(DownloadDocument::class, 'download_document_id');
     }
 }

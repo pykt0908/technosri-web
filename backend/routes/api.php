@@ -16,6 +16,7 @@ use App\Http\Controllers\CarouselController;
 use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\DownloadCategoryController;
 use App\Http\Controllers\DownloadFileController;
+use App\Http\Controllers\DownloadDocumentController;
 
 // Public Routes
 Route::post('/analytics/log', [AnalyticsController::class, 'log']);
@@ -29,6 +30,8 @@ Route::get('/carousels/active', [CarouselController::class, 'active']);
 Route::get('/downloads/categories', [DownloadCategoryController::class, 'index']);
 Route::get('/downloads/categories/{category}', [DownloadCategoryController::class, 'show']);
 Route::get('/downloads/categories/v/{slug}', [DownloadCategoryController::class, 'showBySlug']);
+Route::get('/downloads/documents', [DownloadDocumentController::class, 'index']);
+Route::get('/downloads/documents/{document}', [DownloadDocumentController::class, 'show']);
 Route::get('/downloads/files/{id}/download', [DownloadFileController::class, 'download']);
 
 // Public Curriculum Routes
@@ -87,6 +90,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin Download Routes
     Route::post('downloads/categories/reorder', [DownloadCategoryController::class, 'reorder']);
     Route::apiResource('downloads/categories', DownloadCategoryController::class)->except(['index', 'show']);
+    
+    Route::post('downloads/documents/reorder', [DownloadDocumentController::class, 'reorder']);
+    Route::apiResource('downloads/documents', DownloadDocumentController::class)->except(['index', 'show']);
+
     Route::post('downloads/files/reorder', [DownloadFileController::class, 'reorder']);
     Route::apiResource('downloads/files', DownloadFileController::class)->except(['index', 'show']);
 });

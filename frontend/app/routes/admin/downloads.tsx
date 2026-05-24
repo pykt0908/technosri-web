@@ -5,15 +5,15 @@ import {
     Edit, 
     Trash2, 
     Upload, 
-    FolderPlus, 
     Folder, 
+    FileText,
     File, 
     ArrowUp, 
     ArrowDown, 
-    ChevronRight, 
     Search,
     ExternalLink,
-    Loader2
+    Loader2,
+    ChevronRight
 } from "lucide-react";
 
 interface Category {
@@ -25,7 +25,7 @@ interface Category {
 
 interface DownloadFile {
     id: number;
-    download_category_id: number;
+    download_document_id: number;
     title: string;
     file_path: string;
     file_size: string | null;
@@ -34,14 +34,26 @@ interface DownloadFile {
     created_at: string;
 }
 
+interface DownloadDocument {
+    id: number;
+    download_category_id: number;
+    title: string;
+    sort_order: number;
+    files: DownloadFile[];
+    created_at: string;
+}
+
 export default function AdminDownloads() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-    const [files, setFiles] = useState<DownloadFile[]>([]);
+    
+    const [documents, setDocuments] = useState<DownloadDocument[]>([]);
+    const [selectedDocumentId, setSelectedDocumentId] = useState<number | null>(null);
+    
     const [searchTerm, setSearchTerm] = useState("");
 
     const [loadingCategories, setLoadingCategories] = useState(true);
-    const [loadingFiles, setLoadingFiles] = useState(false);
+    const [loadingDocuments, setLoadingDocuments] = useState(false);
 
     // Modals state
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -50,6 +62,12 @@ export default function AdminDownloads() {
     const [categoryName, setCategoryName] = useState("");
     const [categorySlug, setCategorySlug] = useState("");
     const [savingCategory, setSavingCategory] = useState(false);
+
+    const [isDocModalOpen, setIsDocModalOpen] = useState(false);
+    const [docModalMode, setDocModalMode] = useState<"create" | "edit">("create");
+    const [editingDoc, setEditingDoc] = useState<DownloadDocument | null>(null);
+    const [docTitle, setDocTitle] = useState("");
+    const [savingDoc, setSavingDoc] = useState(false);
 
     const [isFileModalOpen, setIsFileModalOpen] = useState(false);
     const [fileModalMode, setFileModalMode] = useState<"create" | "edit">("create");
@@ -63,12 +81,13 @@ export default function AdminDownloads() {
         fetchCategories();
     }, []);
 
-    // Fetch files when category is selected
+    // Fetch documents when category is selected
     useEffect(() => {
         if (selectedCategoryId !== null) {
-            fetchFiles(selectedCategoryId);
+            fetchDocuments(selectedCategoryId);
         } else {
-            setFiles([]);
+            setDocuments([]);
+            setSelectedDocumentId(null);
         }
     }, [selectedCategoryId]);
 
@@ -89,16 +108,26 @@ export default function AdminDownloads() {
         }
     };
 
-    const fetchFiles = async (categoryId: number) => {
-        setLoadingFiles(true);
+    const fetchDocuments = async (categoryId: number) => {
+        setLoadingDocuments(true);
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/downloads/categories/${categoryId}`);
             const data = await res.json();
-            setFiles(data.files || []);
+            const docs = data.documents || [];
+            setDocuments(docs);
+            
+            // Auto select first document if none selected or if previously selected is not in current list
+            if (docs.length > 0) {
+                if (selectedDocumentId === null || !docs.some((d: any) => d.id === selectedDocumentId)) {
+                    setSelectedDocumentId(docs[0].id);
+                }
+            } else {
+                setSelectedDocumentId(null);
+            }
         } catch (err) {
-            toast.error("ไม่สามารถโหลดไฟล์เอกสารได้");
+            toast.error("ไม่สามารถโหลดฟอร์มเอกสารได้");
         } finally {
-            setLoadingFiles(false);
+            setLoadingDocuments(false);
         }
     };
 
@@ -163,10 +192,10 @@ export default function AdminDownloads() {
     };
 
     const handleDeleteCategory = async (id: number) => {
-        if (!confirm("คุณต้องการลบหมวดหมู่นี้และไฟล์ทั้งหมดที่อยู่ภายใต้หมวดหมู่นี้ใช่หรือไม่? การลบนี้จะไม่สามารถย้อนกลับได้")) return;
+        if (!confirm("คุณต้องการลบหมวดหมู่นี้และเอกสาร/ไฟล์ทั้งหมดที่อยู่ภายใต้หมวดหมู่นี้ใช่หรือไม่? การลบนี้จะไม่สามารถย้อนกลับได้")) return;
 
         const token = localStorage.getItem("admin_token");
-        const loadingToast = toast.loading("กำลังลบหมวดหมู่และไฟล์ที่เกี่ยวข้อง...");
+        const loadingToast = toast.loading("กำลังลบหมวดหมู่และข้อมูลที่เกี่ยวข้อง...");
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/downloads/categories/${id}`, {
                 method: "DELETE",
@@ -213,7 +242,121 @@ export default function AdminDownloads() {
                 body: JSON.stringify({ order: newCategories.map(c => c.id) })
             });
         } catch (err) {
-            toast.error("ไม่สามารถบันทึกลำดับหมวดหมู่ใหม่ไปยังเซิร์ฟเวอร์ได้");
+            toast.error("ไม่สามารถบันทึกลำดับหมวดหมู่ใหม่ได้");
+        }
+    };
+
+    // Document CRUD
+    const handleOpenDocModal = (mode: "create" | "edit", doc?: DownloadDocument) => {
+        setDocModalMode(mode);
+        if (mode === "edit" && doc) {
+            setEditingDoc(doc);
+            setDocTitle(doc.title);
+        } else {
+            setEditingDoc(null);
+            setDocTitle("");
+        }
+        setIsDocModalOpen(true);
+    };
+
+    const handleSaveDoc = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!docTitle.trim() || selectedCategoryId === null) return;
+
+        setSavingDoc(true);
+        const token = localStorage.getItem("admin_token");
+        const isEdit = docModalMode === "edit";
+        const url = isEdit 
+            ? `${import.meta.env.VITE_API_URL}/api/downloads/documents/${editingDoc?.id}`
+            : `${import.meta.env.VITE_API_URL}/api/downloads/documents`;
+        
+        try {
+            const res = await fetch(url, {
+                method: isEdit ? "PUT" : "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({
+                    download_category_id: selectedCategoryId,
+                    title: docTitle
+                })
+            });
+
+            if (res.ok) {
+                const updatedDoc = await res.json();
+                toast.success(isEdit ? "แก้ไขชื่อฟอร์มสำเร็จ" : "เพิ่มฟอร์มเอกสารสำเร็จ");
+                setIsDocModalOpen(false);
+                fetchDocuments(selectedCategoryId).then(() => {
+                    if (!isEdit) {
+                        setSelectedDocumentId(updatedDoc.id);
+                    }
+                });
+            } else {
+                toast.error("เกิดข้อผิดพลาดในการบันทึกฟอร์ม");
+            }
+        } catch (err) {
+            toast.error("เกิดข้อผิดพลาดในการเชื่อมต่อระบบ");
+        } finally {
+            setSavingDoc(false);
+        }
+    };
+
+    const handleDeleteDoc = async (id: number) => {
+        if (!confirm("คุณต้องการลบฟอร์มนี้และไฟล์แนบทั้งหมดของฟอร์มนี้ใช่หรือไม่?")) return;
+
+        const token = localStorage.getItem("admin_token");
+        const loadingToast = toast.loading("กำลังลบฟอร์มและไฟล์...");
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/downloads/documents/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Accept": "application/json"
+                }
+            });
+
+            if (res.ok) {
+                toast.success("ลบฟอร์มสำเร็จ", { id: loadingToast });
+                if (selectedDocumentId === id) {
+                    setSelectedDocumentId(null);
+                }
+                if (selectedCategoryId !== null) {
+                    fetchDocuments(selectedCategoryId);
+                }
+            } else {
+                toast.error("ไม่สามารถลบฟอร์มได้", { id: loadingToast });
+            }
+        } catch (err) {
+            toast.error("เกิดข้อผิดพลาดในการเชื่อมต่อ", { id: loadingToast });
+        }
+    };
+
+    const handleMoveDoc = async (index: number, direction: "up" | "down") => {
+        const newDocs = [...documents];
+        const targetIndex = direction === "up" ? index - 1 : index + 1;
+        if (targetIndex < 0 || targetIndex >= newDocs.length) return;
+
+        // Swap locally
+        const temp = newDocs[index];
+        newDocs[index] = newDocs[targetIndex];
+        newDocs[targetIndex] = temp;
+        setDocuments(newDocs);
+
+        const token = localStorage.getItem("admin_token");
+        try {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/downloads/documents/reorder`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({ order: newDocs.map(d => d.id) })
+            });
+        } catch (err) {
+            toast.error("ไม่สามารถบันทึกลำดับฟอร์มใหม่ได้");
         }
     };
 
@@ -233,9 +376,9 @@ export default function AdminDownloads() {
 
     const handleSaveFile = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!fileTitle.trim()) return;
+        if (!fileTitle.trim() || selectedDocumentId === null) return;
         if (fileModalMode === "create" && !selectedFile) {
-            toast.error("กรุณาเลือกไฟล์ที่ต้องการอัปโหลด");
+            toast.error("กรุณาเลือกไฟล์รูปแบบที่ต้องการอัปโหลด");
             return;
         }
 
@@ -246,20 +389,19 @@ export default function AdminDownloads() {
             ? `${import.meta.env.VITE_API_URL}/api/downloads/files/${editingFile?.id}`
             : `${import.meta.env.VITE_API_URL}/api/downloads/files`;
 
-        // We must use FormData for uploading files
         const formData = new FormData();
-        formData.append("download_category_id", String(selectedCategoryId));
+        formData.append("download_document_id", String(selectedDocumentId));
         formData.append("title", fileTitle);
         if (selectedFile) {
             formData.append("file", selectedFile);
         }
         if (isEdit) {
-            formData.append("_method", "PUT"); // Laravel method spoofing for file uploads in PUT
+            formData.append("_method", "PUT");
         }
 
         try {
             const res = await fetch(url, {
-                method: "POST", // Always POST, Laravel handles PUT with _method
+                method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,
                     "Accept": "application/json"
@@ -268,14 +410,14 @@ export default function AdminDownloads() {
             });
 
             if (res.ok) {
-                toast.success(isEdit ? "แก้ไขไฟล์เอกสารสำเร็จ" : "อัปโหลดไฟล์สำเร็จ");
+                toast.success(isEdit ? "แก้ไขรายละเอียดไฟล์สำเร็จ" : "แนบไฟล์รูปแบบสำเร็จ");
                 setIsFileModalOpen(false);
                 if (selectedCategoryId !== null) {
-                    fetchFiles(selectedCategoryId);
+                    fetchDocuments(selectedCategoryId);
                 }
             } else {
                 const data = await res.json();
-                toast.error(data.message || "เกิดข้อผิดพลาดในการเซฟไฟล์");
+                toast.error(data.message || "เกิดข้อผิดพลาดในการบันทึกไฟล์");
             }
         } catch (err) {
             toast.error("เกิดข้อผิดพลาดในการเชื่อมต่อระบบ");
@@ -285,7 +427,7 @@ export default function AdminDownloads() {
     };
 
     const handleDeleteFile = async (id: number) => {
-        if (!confirm("คุณต้องการลบไฟล์เอกสารนี้ใช่หรือไม่?")) return;
+        if (!confirm("คุณต้องการลบไฟล์แนบรูปแบบนี้ใช่หรือไม่?")) return;
 
         const token = localStorage.getItem("admin_token");
         const loadingToast = toast.loading("กำลังลบไฟล์...");
@@ -299,20 +441,23 @@ export default function AdminDownloads() {
             });
 
             if (res.ok) {
-                toast.success("ลบไฟล์เอกสารสำเร็จ", { id: loadingToast });
+                toast.success("ลบไฟล์แนบสำเร็จ", { id: loadingToast });
                 if (selectedCategoryId !== null) {
-                    fetchFiles(selectedCategoryId);
+                    fetchDocuments(selectedCategoryId);
                 }
             } else {
-                toast.error("ไม่สามารถลบไฟล์เอกสารได้", { id: loadingToast });
+                toast.error("ไม่สามารถลบไฟล์แนบได้", { id: loadingToast });
             }
         } catch (err) {
             toast.error("เกิดข้อผิดพลาดในการเชื่อมต่อ", { id: loadingToast });
         }
     };
 
-    const handleMoveFile = async (index: number, direction: "up" | "down") => {
-        const newFiles = [...files];
+    const handleMoveFile = async (docId: number, index: number, direction: "up" | "down") => {
+        const doc = documents.find(d => d.id === docId);
+        if (!doc) return;
+
+        const newFiles = [...doc.files];
         const targetIndex = direction === "up" ? index - 1 : index + 1;
         if (targetIndex < 0 || targetIndex >= newFiles.length) return;
 
@@ -320,7 +465,11 @@ export default function AdminDownloads() {
         const temp = newFiles[index];
         newFiles[index] = newFiles[targetIndex];
         newFiles[targetIndex] = temp;
-        setFiles(newFiles);
+
+        // Optimistically update documents state
+        setDocuments(prevDocs =>
+            prevDocs.map(d => d.id === docId ? { ...d, files: newFiles } : d)
+        );
 
         const token = localStorage.getItem("admin_token");
         try {
@@ -334,13 +483,16 @@ export default function AdminDownloads() {
                 body: JSON.stringify({ order: newFiles.map(f => f.id) })
             });
         } catch (err) {
-            toast.error("ไม่สามารถบันทึกลำดับไฟล์ใหม่ไปยังเซิร์ฟเวอร์ได้");
+            toast.error("ไม่สามารถบันทึกลำดับไฟล์ใหม่ได้");
         }
     };
 
-    const filteredFiles = files.filter(file =>
-        file.title.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredDocuments = documents.filter(doc =>
+        doc.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const selectedDoc = documents.find(d => d.id === selectedDocumentId);
+    const files = selectedDoc ? selectedDoc.files : [];
 
     return (
         <div className="max-w-[1600px] mx-auto pb-20">
@@ -348,34 +500,34 @@ export default function AdminDownloads() {
             <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-200 dark:border-slate-800 pb-8 mb-10">
                 <div>
                     <div className="flex items-center text-[10px] font-bold text-primary-600 uppercase tracking-widest mb-2 bg-primary-50 dark:bg-primary-900/20 px-3 py-1 rounded-full w-fit border border-primary-100 dark:border-primary-800">
-                        <Upload size={10} className="mr-2 animate-pulse" /> Document Download Center
+                        <Upload size={10} className="mr-2 animate-pulse" /> Nested Document Download Manager
                     </div>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">จัดการระบบดาวน์โหลดเอกสาร</h1>
-                    <p className="text-sm text-slate-500 mt-1">บริหารจัดการหมวดหมู่และไฟล์เอกสารประกอบหลักสูตร ใบสมัคร หรือเอกสารทั่วไปของวิทยาลัย</p>
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">จัดการระบบดาวน์โหลดเอกสาร (หลายรูปแบบ)</h1>
+                    <p className="text-sm text-slate-500 mt-1">บริหารจัดการหมวดหมู่ ฟอร์มหลักสูตร และอัปโหลดไฟล์หลายรูปแบบ (เช่น .pdf และ .docx คู่กัน) ได้อย่างเป็นระบบ</p>
                 </div>
             </header>
 
-            {/* Split Grid Layout */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
+            {/* Split 3-Pane Dashboard Layout */}
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
                 
-                {/* Column 1: Categories Management (1/3 width) */}
-                <div className="xl:col-span-1 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-100/50 dark:shadow-none">
+                {/* Panel 1: Categories Management (3/12 width) */}
+                <div className="xl:col-span-3 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-100/50 dark:shadow-none">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-lg font-black text-slate-800 dark:text-white flex items-center">
-                            <Folder className="mr-2 text-slate-400" size={18} /> หมวดหมู่ทั้งหมด
+                        <h2 className="text-sm font-black text-slate-800 dark:text-white flex items-center uppercase tracking-wider">
+                            <Folder className="mr-2 text-slate-400" size={16} /> หมวดหมู่ย่อย
                         </h2>
                         <button
                             onClick={() => handleOpenCategoryModal("create")}
-                            className="p-2 bg-primary-50 hover:bg-primary-100 text-primary-600 dark:bg-primary-950/40 dark:hover:bg-primary-950/60 rounded-xl transition-all flex items-center text-xs font-bold"
+                            className="p-1.5 bg-primary-50 hover:bg-primary-100 text-primary-600 dark:bg-primary-950/40 dark:hover:bg-primary-950/60 rounded-xl transition-all flex items-center text-[10px] font-bold"
                             title="เพิ่มหมวดหมู่ใหม่"
                         >
-                            <Plus size={16} className="mr-1" /> เพิ่ม
+                            <Plus size={14} className="mr-0.5" /> เพิ่ม
                         </button>
                     </div>
 
                     {loadingCategories ? (
                         <div className="flex justify-center items-center py-10">
-                            <Loader2 className="animate-spin text-primary-500" size={24} />
+                            <Loader2 className="animate-spin text-primary-500" size={20} />
                         </div>
                     ) : (
                         <div className="space-y-2">
@@ -387,19 +539,19 @@ export default function AdminDownloads() {
                                         onClick={() => setSelectedCategoryId(cat.id)}
                                         className={`group flex items-center justify-between p-3.5 rounded-2xl cursor-pointer border transition-all duration-200 ${
                                             isSelected
-                                                ? "bg-slate-900 text-white border-slate-900 dark:bg-slate-800 dark:border-slate-800"
-                                                : "bg-slate-50 dark:bg-slate-900/60 border-slate-100 dark:border-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 hover:-translate-x-1"
+                                                ? "bg-slate-950 text-white border-slate-950 dark:bg-slate-850 dark:border-slate-850"
+                                                : "bg-slate-50 dark:bg-slate-900/60 border-slate-100 dark:border-slate-800/80 text-slate-700 dark:text-slate-350 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 hover:-translate-x-1"
                                         }`}
                                     >
-                                        <div className="flex items-center space-x-3 truncate">
-                                            <Folder className={isSelected ? "text-primary-400" : "text-slate-400 group-hover:text-primary-500"} size={16} />
+                                        <div className="flex items-center space-x-2 truncate">
+                                            <Folder className={isSelected ? "text-primary-400" : "text-slate-450 group-hover:text-primary-500"} size={15} />
                                             <div className="truncate">
-                                                <p className="font-bold text-sm truncate">{cat.name}</p>
-                                                <p className={`text-[10px] font-mono ${isSelected ? "text-slate-400" : "text-slate-400"}`}>/{cat.slug}</p>
+                                                <p className="font-bold text-xs truncate">{cat.name}</p>
+                                                <p className="text-[9px] font-mono text-slate-400">/{cat.slug}</p>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center space-x-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                             {/* Move buttons */}
                                             <button
                                                 disabled={index === 0}
@@ -407,7 +559,7 @@ export default function AdminDownloads() {
                                                     e.stopPropagation();
                                                     handleMoveCategory(index, "up");
                                                 }}
-                                                className="p-1 text-slate-400 hover:text-white rounded disabled:opacity-30"
+                                                className="p-0.5 text-slate-450 hover:text-white rounded disabled:opacity-20"
                                             >
                                                 <ArrowUp size={12} />
                                             </button>
@@ -417,7 +569,7 @@ export default function AdminDownloads() {
                                                     e.stopPropagation();
                                                     handleMoveCategory(index, "down");
                                                 }}
-                                                className="p-1 text-slate-400 hover:text-white rounded disabled:opacity-30"
+                                                className="p-0.5 text-slate-455 hover:text-white rounded disabled:opacity-20"
                                             >
                                                 <ArrowDown size={12} />
                                             </button>
@@ -428,20 +580,18 @@ export default function AdminDownloads() {
                                                     e.stopPropagation();
                                                     handleOpenCategoryModal("edit", cat);
                                                 }}
-                                                className={`p-1.5 rounded hover:bg-slate-700 ${isSelected ? "text-blue-400" : "text-blue-500"}`}
-                                                title="แก้ไขหมวดหมู่"
+                                                className="p-1 rounded hover:bg-slate-700 text-blue-500 hover:text-blue-400"
                                             >
-                                                <Edit size={12} />
+                                                <Edit size={11} />
                                             </button>
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleDeleteCategory(cat.id);
                                                 }}
-                                                className={`p-1.5 rounded hover:bg-slate-700 ${isSelected ? "text-red-400" : "text-red-500"}`}
-                                                title="ลบหมวดหมู่"
+                                                className="p-1 rounded hover:bg-slate-700 text-red-500 hover:text-red-400"
                                             >
-                                                <Trash2 size={12} />
+                                                <Trash2 size={11} />
                                             </button>
                                         </div>
                                     </div>
@@ -449,153 +599,244 @@ export default function AdminDownloads() {
                             })}
 
                             {categories.length === 0 && (
-                                <div className="text-center py-8 text-slate-400 text-xs font-bold bg-slate-50 dark:bg-slate-900/30 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
-                                    ยังไม่มีหมวดหมู่เอกสาร
+                                <div className="text-center py-8 text-slate-400 text-[10px] font-bold bg-slate-50 dark:bg-slate-900/30 rounded-2xl border border-dashed border-slate-200">
+                                    ยังไม่มีหมวดหมู่ย่อย
                                 </div>
                             )}
                         </div>
                     )}
                 </div>
 
-                {/* Column 2: Files in selected Category (2/3 width) */}
-                <div className="xl:col-span-2 space-y-6">
-                    
+                {/* Panel 2: Documents/Forms Container (4/12 width) */}
+                <div className="xl:col-span-4 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-100/50 dark:shadow-none">
                     {selectedCategoryId === null ? (
-                        <div className="bg-white dark:bg-slate-900 p-12 rounded-3xl border border-slate-200 dark:border-slate-800 text-center text-slate-400 font-bold shadow-md">
-                            กรุณาเลือกหรือเพิ่มหมวดหมู่ที่คอลัมน์ซ้ายมือก่อน
+                        <div className="text-center py-20 text-slate-400 text-xs font-bold">
+                            เลือกหมวดหมู่เพื่อจัดการรายการฟอร์ม
                         </div>
                     ) : (
-                        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-100/50 dark:shadow-none">
-                            
-                            {/* Toolbar */}
-                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-6 border-b border-slate-100 dark:border-slate-800">
-                                <div className="space-y-1">
-                                    <h2 className="text-lg font-black text-slate-800 dark:text-white flex items-center">
-                                        <Folder className="mr-2 text-primary-500 animate-pulse" size={18} />
-                                        <span>จัดการไฟล์ภายใต้หมวดหมู่: </span>
-                                        <span className="text-primary-600 dark:text-primary-400 ml-1.5">
-                                            {categories.find(c => c.id === selectedCategoryId)?.name}
-                                        </span>
-                                    </h2>
-                                </div>
+                        <>
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-sm font-black text-slate-800 dark:text-white flex items-center uppercase tracking-wider">
+                                    <FileText className="mr-2 text-primary-500 animate-pulse" size={16} /> รายชื่อฟอร์ม / เอกสาร
+                                </h2>
                                 <button
-                                    onClick={() => handleOpenFileModal("create")}
-                                    className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-all flex items-center text-xs font-black uppercase tracking-wider shadow-lg shadow-primary-500/10"
+                                    onClick={() => handleOpenDocModal("create")}
+                                    className="p-1.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-all flex items-center text-[10px] font-black uppercase tracking-wider"
                                 >
-                                    <Upload size={14} className="mr-2" /> อัปโหลดเอกสารใหม่
+                                    <Plus size={14} className="mr-0.5" /> เพิ่มฟอร์ม
                                 </button>
                             </div>
 
-                            {/* Search bar inside selected category files */}
-                            <div className="mb-6 relative">
-                                <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
-                                    <Search size={16} />
+                            {/* Search Document Bar */}
+                            <div className="mb-4 relative">
+                                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                    <Search size={14} />
                                 </span>
                                 <input
                                     type="text"
-                                    placeholder="ค้นหาเอกสารตามชื่อไฟล์..."
+                                    placeholder="ค้นหารายชื่อฟอร์มเอกสาร..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-primary-500 transition-all outline-none text-xs font-bold text-slate-700 dark:text-white"
+                                    className="w-full pl-9 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-primary-500 transition-all outline-none text-[11px] font-bold text-slate-700 dark:text-white"
                                 />
                             </div>
 
-                            {/* Files Table / List */}
-                            {loadingFiles ? (
+                            {loadingDocuments ? (
                                 <div className="flex justify-center items-center py-20">
-                                    <Loader2 className="animate-spin text-primary-500" size={32} />
+                                    <Loader2 className="animate-spin text-primary-500" size={24} />
                                 </div>
                             ) : (
-                                <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800">
-                                    <table className="w-full text-left text-xs border-collapse">
-                                        <thead>
-                                            <tr className="bg-slate-50 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 uppercase font-black tracking-widest">
-                                                <th className="px-6 py-4">ชื่อไฟล์ / เอกสาร</th>
-                                                <th className="px-6 py-4">ขนาดไฟล์</th>
-                                                <th className="px-6 py-4 text-center">ดาวน์โหลด</th>
-                                                <th className="px-6 py-4 text-center">เรียงลำดับ</th>
-                                                <th className="px-6 py-4 text-center">จัดการ</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60 font-semibold">
-                                            {filteredFiles.map((file, index) => (
-                                                <tr key={file.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                                                    <td className="px-6 py-4.5">
-                                                        <div className="flex items-center space-x-3 max-w-[280px] sm:max-w-none">
-                                                            <File className="text-slate-400 dark:text-slate-500 flex-shrink-0" size={18} />
-                                                            <div className="truncate">
-                                                                <p className="font-bold text-slate-700 dark:text-slate-200 truncate">{file.title}</p>
-                                                                <a 
-                                                                    href={`${import.meta.env.VITE_API_URL}/storage/${file.file_path}`} 
-                                                                    target="_blank" 
-                                                                    rel="noopener noreferrer"
-                                                                    className="text-[9px] text-primary-500 dark:text-primary-400 font-mono hover:underline inline-flex items-center truncate mt-0.5"
-                                                                >
-                                                                    /storage/{file.file_path} <ExternalLink size={8} className="ml-1" />
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-4.5 text-slate-400 font-mono text-[10px]">
-                                                        {file.file_size || "N/A"}
-                                                    </td>
-                                                    <td className="px-6 py-4.5 text-center font-bold font-mono text-slate-500">
-                                                        {file.download_count.toLocaleString()} ครั้ง
-                                                    </td>
-                                                    <td className="px-6 py-4.5 text-center">
-                                                        <div className="inline-flex items-center space-x-1">
-                                                            <button
-                                                                disabled={index === 0}
-                                                                onClick={() => handleMoveFile(index, "up")}
-                                                                className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded disabled:opacity-20 text-slate-400 hover:text-primary-500 transition-colors"
-                                                            >
-                                                                <ArrowUp size={12} />
-                                                            </button>
-                                                            <button
-                                                                disabled={index === files.length - 1}
-                                                                onClick={() => handleMoveFile(index, "down")}
-                                                                className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded disabled:opacity-20 text-slate-400 hover:text-primary-500 transition-colors"
-                                                            >
-                                                                <ArrowDown size={12} />
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-4.5 text-center">
-                                                        <div className="flex justify-center space-x-2">
-                                                            <button
-                                                                onClick={() => handleOpenFileModal("edit", file)}
-                                                                className="w-8 h-8 flex items-center justify-center text-blue-500 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-500 hover:text-white rounded-lg transition-all"
-                                                                title="แก้ไขหัวข้อไฟล์"
-                                                            >
-                                                                <Edit size={12} />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleDeleteFile(file.id)}
-                                                                className="w-8 h-8 flex items-center justify-center text-red-500 bg-red-50 dark:bg-red-900/20 hover:bg-red-500 hover:text-white rounded-lg transition-all"
-                                                                title="ลบไฟล์"
-                                                            >
-                                                                <Trash2 size={12} />
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))}
+                                <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+                                    {filteredDocuments.map((doc, index) => {
+                                        const isSelected = doc.id === selectedDocumentId;
+                                        return (
+                                            <div
+                                                key={doc.id}
+                                                onClick={() => setSelectedDocumentId(doc.id)}
+                                                className={`group flex items-center justify-between p-3.5 rounded-2xl cursor-pointer border transition-all duration-200 ${
+                                                    isSelected
+                                                        ? "bg-slate-900 border-slate-900 text-white dark:bg-slate-800 dark:border-slate-800"
+                                                        : "bg-slate-50 dark:bg-slate-900/60 border-slate-100 dark:border-slate-800/80 text-slate-700 dark:text-slate-350 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 hover:-translate-x-1"
+                                                }`}
+                                            >
+                                                <div className="flex items-center space-x-3 truncate flex-1 min-w-0">
+                                                    <FileText className={isSelected ? "text-primary-400" : "text-slate-450"} size={16} />
+                                                    <div className="truncate">
+                                                        <p className="font-bold text-xs truncate text-slate-800 dark:text-slate-100 group-hover:text-primary-500 dark:group-hover:text-primary-400">{doc.title}</p>
+                                                        <p className="text-[9px] text-slate-400 font-bold mt-0.5">มีไฟล์แนบอยู่: {doc.files.length} รูปแบบ</p>
+                                                    </div>
+                                                </div>
 
-                                            {filteredFiles.length === 0 && (
-                                                <tr>
-                                                    <td colSpan={5} className="py-16 text-center text-slate-400 font-bold">
-                                                        {searchTerm ? "ไม่พบไฟล์ที่ค้นหา" : "หมวดหมู่นี้ยังไม่มีไฟล์เอกสาร กดปุ่มอัปโหลดเอกสารด้านบนเพื่ออัปโหลด"}
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
+                                                <div className="flex items-center space-x-1.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                                                    {/* Move buttons */}
+                                                    <button
+                                                        disabled={index === 0}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleMoveDoc(index, "up");
+                                                        }}
+                                                        className="p-0.5 text-slate-400 hover:text-white rounded disabled:opacity-20"
+                                                    >
+                                                        <ArrowUp size={12} />
+                                                    </button>
+                                                    <button
+                                                        disabled={index === documents.length - 1}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleMoveDoc(index, "down");
+                                                        }}
+                                                        className="p-0.5 text-slate-400 hover:text-white rounded disabled:opacity-20"
+                                                    >
+                                                        <ArrowDown size={12} />
+                                                    </button>
+
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleOpenDocModal("edit", doc);
+                                                        }}
+                                                        className="p-1 rounded text-blue-500 hover:text-blue-400"
+                                                        title="แก้ไขชื่อฟอร์ม"
+                                                    >
+                                                        <Edit size={11} />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDeleteDoc(doc.id);
+                                                        }}
+                                                        className="p-1 rounded text-red-500 hover:text-red-400"
+                                                        title="ลบฟอร์ม"
+                                                    >
+                                                        <Trash2 size={11} />
+                                                    </button>
+                                                    <ChevronRight size={14} className="text-slate-400" />
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+
+                                    {filteredDocuments.length === 0 && (
+                                        <div className="text-center py-16 text-slate-400 text-xs font-bold">
+                                            ยังไม่มีฟอร์มเอกสารในหมวดหมู่นี้
+                                        </div>
+                                    )}
                                 </div>
                             )}
-
-                        </div>
+                        </>
                     )}
+                </div>
 
+                {/* Panel 3: Attached Form Formats/Files (5/12 width) */}
+                <div className="xl:col-span-5 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-100/50 dark:shadow-none">
+                    {selectedDocumentId === null ? (
+                        <div className="text-center py-20 text-slate-400 text-xs font-bold">
+                            เลือกรายชื่อฟอร์มตรงกลางเพื่อบริหารจัดการอัปโหลดไฟล์รูปแบบ (.pdf, .docx, .zip)
+                        </div>
+                    ) : (
+                        <>
+                            <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
+                                <div className="truncate flex-1 min-w-0 mr-4">
+                                    <h2 className="text-sm font-black text-slate-800 dark:text-white truncate">
+                                        ไฟล์รูปแบบของฟอร์ม:
+                                    </h2>
+                                    <p className="text-[11px] font-black text-primary-650 dark:text-primary-400 truncate mt-1">
+                                        {selectedDoc?.title}
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => handleOpenFileModal("create")}
+                                    className="px-3.5 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-all flex items-center text-[10px] font-black uppercase tracking-wider flex-shrink-0 shadow-lg shadow-primary-500/10"
+                                >
+                                    <Upload size={13} className="mr-1.5" /> แนบไฟล์รูปแบบใหม่
+                                </button>
+                            </div>
+
+                            {/* Files Table List */}
+                            <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800/80">
+                                <table className="w-full text-left text-[11px] border-collapse">
+                                    <thead>
+                                        <tr className="bg-slate-50 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 text-[9px] text-slate-400 uppercase font-black tracking-widest">
+                                            <th className="px-4 py-3">รายละเอียดรูปแบบ</th>
+                                            <th className="px-4 py-3 text-center">สถิติ</th>
+                                            <th className="px-4 py-3 text-center">เรียง</th>
+                                            <th className="px-4 py-3 text-center">จัดการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60 font-semibold">
+                                        {files.map((file, index) => (
+                                            <tr key={file.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-850/35 transition-colors">
+                                                <td className="px-4 py-3.5">
+                                                    <div className="flex items-center space-x-2.5 max-w-[200px] truncate">
+                                                        <File className="text-slate-400 dark:text-slate-500 flex-shrink-0" size={15} />
+                                                        <div className="truncate">
+                                                            <p className="font-bold text-slate-700 dark:text-slate-200 truncate">{file.title}</p>
+                                                            <a 
+                                                                href={`${import.meta.env.VITE_API_URL}/storage/${file.file_path}`} 
+                                                                target="_blank" 
+                                                                rel="noopener noreferrer"
+                                                                className="text-[8px] text-primary-500 font-mono hover:underline inline-flex items-center truncate mt-0.5"
+                                                            >
+                                                                /{file.file_path.split('/').pop()} <ExternalLink size={8} className="ml-0.5" />
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3.5 text-center font-mono text-[9px] text-slate-400">
+                                                    <p className="font-bold text-slate-500">{file.file_size || "N/A"}</p>
+                                                    <p className="mt-0.5">{file.download_count} ครั้ง</p>
+                                                </td>
+                                                <td className="px-4 py-3.5 text-center">
+                                                    <div className="inline-flex flex-col sm:flex-row items-center gap-0.5">
+                                                        <button
+                                                            disabled={index === 0}
+                                                            onClick={() => handleMoveFile(selectedDocumentId, index, "up")}
+                                                            className="p-0.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded disabled:opacity-20 text-slate-400 hover:text-primary-500"
+                                                        >
+                                                            <ArrowUp size={11} />
+                                                        </button>
+                                                        <button
+                                                            disabled={index === files.length - 1}
+                                                            onClick={() => handleMoveFile(selectedDocumentId, index, "down")}
+                                                            className="p-0.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded disabled:opacity-20 text-slate-400 hover:text-primary-500"
+                                                        >
+                                                            <ArrowDown size={11} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3.5 text-center">
+                                                    <div className="flex justify-center space-x-1">
+                                                        <button
+                                                            onClick={() => handleOpenFileModal("edit", file)}
+                                                            className="w-7 h-7 flex items-center justify-center text-blue-500 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-500 hover:text-white rounded-lg transition-all"
+                                                            title="แก้ไขชื่อรูปแบบ"
+                                                        >
+                                                            <Edit size={11} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteFile(file.id)}
+                                                            className="w-7 h-7 flex items-center justify-center text-red-500 bg-red-50 dark:bg-red-900/20 hover:bg-red-500 hover:text-white rounded-lg transition-all"
+                                                            title="ลบไฟล์แนบ"
+                                                        >
+                                                            <Trash2 size={11} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+
+                                        {files.length === 0 && (
+                                            <tr>
+                                                <td colSpan={4} className="py-12 text-center text-slate-400 font-bold italic">
+                                                    ยังไม่มีการอัปโหลดรูปแบบไฟล์แนบสำหรับฟอร์มนี้
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </>
+                    )}
                 </div>
 
             </div>
@@ -610,7 +851,7 @@ export default function AdminDownloads() {
                         </h3>
                         <form onSubmit={handleSaveCategory} className="space-y-4">
                             <div>
-                                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-2">ชื่อหมวดหมู่ (ภาษาไทย)</label>
+                                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-2">ชื่อหมวดหมู่</label>
                                 <input
                                     type="text"
                                     required
@@ -654,28 +895,70 @@ export default function AdminDownloads() {
                 </div>
             )}
 
+            {/* Document Add/Edit Modal */}
+            {isDocModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsDocModalOpen(false)} />
+                    <div className="relative bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 p-6 z-10">
+                        <h3 className="text-base font-black text-slate-900 dark:text-white mb-6 flex items-center">
+                            {docModalMode === "edit" ? "แก้ไขชื่อฟอร์มเอกสาร" : "เพิ่มฟอร์มเอกสารใหม่"}
+                        </h3>
+                        <form onSubmit={handleSaveDoc} className="space-y-4">
+                            <div>
+                                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-2">ชื่อฟอร์ม / รายการเอกสาร</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={docTitle}
+                                    onChange={(e) => setDocTitle(e.target.value)}
+                                    placeholder="เช่น ใบสมัครเรียน ปวช. ประจำปีการศึกษา 2569"
+                                    className="w-full bg-slate-50 dark:bg-slate-855 border border-slate-100 dark:border-slate-800 rounded-xl px-4 py-3 text-xs font-bold text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
+                                />
+                            </div>
+
+                            <div className="flex space-x-3 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsDocModalOpen(false)}
+                                    className="flex-1 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-350 rounded-xl text-xs font-bold transition-all"
+                                >
+                                    ยกเลิก
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={savingDoc}
+                                    className="flex-1 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-xs font-bold transition-all flex justify-center items-center"
+                                >
+                                    {savingDoc ? <Loader2 className="animate-spin text-white mr-2" size={14} /> : null}
+                                    <span>บันทึก</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
             {/* File Add/Edit Modal */}
             {isFileModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsFileModalOpen(false)} />
                     <div className="relative bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 p-6 z-10">
                         <h3 className="text-base font-black text-slate-900 dark:text-white mb-6 flex items-center">
-                            {fileModalMode === "edit" ? "แก้ไขชื่อไฟล์เอกสาร" : "อัปโหลดเอกสารใหม่"}
+                            {fileModalMode === "edit" ? "แก้ไขข้อมูลไฟล์รูปแบบ" : "แนบไฟล์รูปแบบใหม่"}
                         </h3>
                         <form onSubmit={handleSaveFile} className="space-y-4">
                             <div>
-                                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-2">ชื่อหัวข้อเอกสาร</label>
+                                <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-2">ชื่อรูปแบบ / ฟอร์แมตไฟล์</label>
                                 <input
                                     type="text"
                                     required
                                     value={fileTitle}
                                     onChange={(e) => setFileTitle(e.target.value)}
-                                    placeholder="เช่น ใบสมัคร ปวช./ปวส. หรือ ระเบียบการเรียนการสอนปี 2569"
-                                    className="w-full bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-slate-800 rounded-xl px-4 py-3 text-xs font-bold text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
+                                    placeholder="เช่น ดาวน์โหลดไฟล์ PDF, ไฟล์สำหรับ Microsoft Word (.docx)"
+                                    className="w-full bg-slate-50 dark:bg-slate-855 border border-slate-100 dark:border-slate-800 rounded-xl px-4 py-3 text-xs font-bold text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-primary-500"
                                 />
                             </div>
 
-                            {/* Only show file input if creating OR user explicitly wants to replace file */}
                             {fileModalMode === "create" ? (
                                 <div>
                                     <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-2">เลือกไฟล์เอกสาร (จำกัดไม่เกิน 20MB)</label>
@@ -688,7 +971,7 @@ export default function AdminDownloads() {
                                             }
                                         }}
                                         accept=".pdf,.docx,.doc,.xls,.xlsx,.zip,.rar,.png,.jpg,.jpeg"
-                                        className="w-full bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-slate-800 rounded-xl px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 outline-none focus:ring-2 focus:ring-primary-500"
+                                        className="w-full bg-slate-50 dark:bg-slate-855 border border-slate-100 dark:border-slate-800 rounded-xl px-4 py-3 text-xs font-bold text-slate-550 dark:text-slate-400 outline-none focus:ring-2 focus:ring-primary-500"
                                     />
                                 </div>
                             ) : (
@@ -702,9 +985,9 @@ export default function AdminDownloads() {
                                             }
                                         }}
                                         accept=".pdf,.docx,.doc,.xls,.xlsx,.zip,.rar,.png,.jpg,.jpeg"
-                                        className="w-full bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-slate-800 rounded-xl px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 outline-none focus:ring-2 focus:ring-primary-500"
+                                        className="w-full bg-slate-50 dark:bg-slate-855 border border-slate-100 dark:border-slate-800 rounded-xl px-4 py-3 text-xs font-bold text-slate-550 dark:text-slate-400 outline-none focus:ring-2 focus:ring-primary-500"
                                     />
-                                    <p className="text-[10px] text-slate-400 font-bold mt-1.5 italic">ไฟล์เดิม: /storage/{editingFile?.file_path}</p>
+                                    <p className="text-[9px] text-slate-450 font-bold mt-1.5 italic">ไฟล์เดิม: /storage/{editingFile?.file_path}</p>
                                 </div>
                             )}
 

@@ -177,8 +177,8 @@ const content: Record<string, JSX.Element> = {
                         <i className="fas fa-landmark text-lg"></i>
                     </div>
                     <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-2">College Identity</h4>
-                    <div className="text-2xl font-black text-slate-900 dark:text-white mb-2">อัตลักษณ์วิทยาลัย</div>
-                    <p className="text-primary-600 font-bold text-xl">เป็นเรียนรู้ สู่อาชีพ</p>
+                    <div className="text-2xl font-black text-slate-900 dark:text-white mb-2">อัตลักษณ์</div>
+                    <p className="text-primary-600 font-bold text-xl">ทักษะดี มีวินัย ใฝ่คุณธรรม</p>
                 </div>
 
                 <div className="md:col-span-6 p-10 border border-gray-100 dark:border-gray-800 rounded-[2rem] hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors group">
@@ -186,8 +186,8 @@ const content: Record<string, JSX.Element> = {
                         <i className="fas fa-user-graduate text-lg"></i>
                     </div>
                     <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-2">Learner Identity</h4>
-                    <div className="text-2xl font-black text-slate-900 dark:text-white mb-2">อัตลักษณ์ผู้เรียน</div>
-                    <p className="text-slate-600 dark:text-slate-400 font-bold text-xl">บุคลิกภาพดี</p>
+                    <div className="text-2xl font-black text-slate-900 dark:text-white mb-2">เอกลักษณ์</div>
+                    <p className="text-slate-600 dark:text-slate-400 font-bold text-xl">เป็นแหล่งเรียนรู้ สู่อาชีพ</p>
                 </div>
             </div>
         </div>

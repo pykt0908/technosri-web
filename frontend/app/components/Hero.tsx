@@ -164,7 +164,7 @@ export default function Hero({ initialData = [] }: { initialData?: CarouselItem[
                         <div className="lg:col-span-8">
                             <Reveal animation="fade-up" duration={1.2}>
                                 <span className="text-primary-700 font-black tracking-[0.3em] uppercase text-sm mb-6 block">
-                                    เปิดโอกาศใหม่ ๆ ในการเรียนรู้และพัฒนาทักษะของคุณ
+                                    เปิดโอกาสใหม่ ๆ ในการเรียนรู้และพัฒนาทักษะของคุณ
                                 </span>
                                 <h1 className="kinetic-text uppercase mb-10 leading-[0.9] dark:text-white">
                                     The Future<br />

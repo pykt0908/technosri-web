@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('download_files', function (Blueprint $table) {
+        Schema::create('download_documents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('download_document_id')->constrained('download_documents')->onDelete('cascade');
+            $table->foreignId('download_category_id')->constrained('download_categories')->onDelete('cascade');
             $table->string('title');
-            $table->string('file_path');
-            $table->string('file_size')->nullable();
-            $table->integer('download_count')->default(0);
             $table->integer('sort_order')->default(0);
             $table->timestamps();
         });
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('download_files');
+        Schema::dropIfExists('download_documents');
     }
 };

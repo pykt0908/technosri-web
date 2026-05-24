@@ -500,10 +500,9 @@ export default function AdminDownloads() {
             <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-200 dark:border-slate-800 pb-8 mb-10">
                 <div>
                     <div className="flex items-center text-[10px] font-bold text-primary-600 uppercase tracking-widest mb-2 bg-primary-50 dark:bg-primary-900/20 px-3 py-1 rounded-full w-fit border border-primary-100 dark:border-primary-800">
-                        <Upload size={10} className="mr-2 animate-pulse" /> Nested Document Download Manager
+                        <Upload size={10} className="mr-2 animate-pulse" /> ระบบจัดการเอกสารดาวน์โหลด
                     </div>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">จัดการระบบดาวน์โหลดเอกสาร (หลายรูปแบบ)</h1>
-                    <p className="text-sm text-slate-500 mt-1">บริหารจัดการหมวดหมู่ ฟอร์มหลักสูตร และอัปโหลดไฟล์หลายรูปแบบ (เช่น .pdf และ .docx คู่กัน) ได้อย่างเป็นระบบ</p>
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">จัดการระบบดาวน์โหลดเอกสาร</h1>
                 </div>
             </header>
 
@@ -514,6 +513,7 @@ export default function AdminDownloads() {
                 <div className="xl:col-span-3 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-100/50 dark:shadow-none">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-sm font-black text-slate-800 dark:text-white flex items-center uppercase tracking-wider">
+                            <span className="w-5 h-5 flex items-center justify-center rounded-full bg-primary-100 dark:bg-primary-950 text-primary-650 dark:text-primary-400 text-[10px] font-black mr-2">1</span>
                             <Folder className="mr-2 text-slate-400" size={16} /> หมวดหมู่ย่อย
                         </h2>
                         <button
@@ -617,6 +617,7 @@ export default function AdminDownloads() {
                         <>
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-sm font-black text-slate-800 dark:text-white flex items-center uppercase tracking-wider">
+                                    <span className="w-5 h-5 flex items-center justify-center rounded-full bg-primary-100 dark:bg-primary-950 text-primary-650 dark:text-primary-400 text-[10px] font-black mr-2">2</span>
                                     <FileText className="mr-2 text-primary-500 animate-pulse" size={16} /> รายชื่อฟอร์ม / เอกสาร
                                 </h2>
                                 <button
@@ -737,10 +738,11 @@ export default function AdminDownloads() {
                         <>
                             <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
                                 <div className="truncate flex-1 min-w-0 mr-4">
-                                    <h2 className="text-sm font-black text-slate-800 dark:text-white truncate">
+                                    <h2 className="text-sm font-black text-slate-800 dark:text-white flex items-center truncate">
+                                        <span className="w-5 h-5 flex items-center justify-center rounded-full bg-primary-100 dark:bg-primary-950 text-primary-650 dark:text-primary-400 text-[10px] font-black mr-2">3</span>
                                         ไฟล์รูปแบบของฟอร์ม:
                                     </h2>
-                                    <p className="text-[11px] font-black text-primary-650 dark:text-primary-400 truncate mt-1">
+                                    <p className="text-[11px] font-black text-primary-650 dark:text-primary-400 truncate mt-1.5 pl-7">
                                         {selectedDoc?.title}
                                     </p>
                                 </div>
@@ -767,7 +769,7 @@ export default function AdminDownloads() {
                                         {files.map((file, index) => (
                                             <tr key={file.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-850/35 transition-colors">
                                                 <td className="px-4 py-3.5">
-                                                    <div className="flex items-center space-x-2.5 max-w-[200px] truncate">
+                                                    <div className="flex items-center space-x-2.5 max-w-[220px] truncate">
                                                         <File className="text-slate-400 dark:text-slate-500 flex-shrink-0" size={15} />
                                                         <div className="truncate">
                                                             <p className="font-bold text-slate-700 dark:text-slate-200 truncate">{file.title}</p>
@@ -775,9 +777,9 @@ export default function AdminDownloads() {
                                                                 href={`${import.meta.env.VITE_API_URL}/storage/${file.file_path}`} 
                                                                 target="_blank" 
                                                                 rel="noopener noreferrer"
-                                                                className="text-[8px] text-primary-500 font-mono hover:underline inline-flex items-center truncate mt-0.5"
+                                                                className="text-[9px] text-primary-600 hover:text-primary-750 font-bold hover:underline inline-flex items-center mt-1 bg-primary-50 dark:bg-primary-950/40 px-2 py-0.5 rounded-md w-fit border border-primary-100 dark:border-primary-900/60 transition-colors"
                                                             >
-                                                                /{file.file_path.split('/').pop()} <ExternalLink size={8} className="ml-0.5" />
+                                                                <ExternalLink size={9} className="mr-1" /> เปิดดูไฟล์แนบ
                                                             </a>
                                                         </div>
                                                     </div>

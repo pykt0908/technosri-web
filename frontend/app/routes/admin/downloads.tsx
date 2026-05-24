@@ -551,47 +551,71 @@ export default function AdminDownloads() {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            {/* Move buttons */}
+                                        <div className="flex items-center space-x-1 flex-shrink-0">
+                                            {/* Move Up */}
                                             <button
                                                 disabled={index === 0}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleMoveCategory(index, "up");
                                                 }}
-                                                className="p-0.5 text-slate-450 hover:text-white rounded disabled:opacity-20"
+                                                className={`w-6 h-6 flex items-center justify-center rounded-lg transition-all active:scale-95 disabled:opacity-20 disabled:pointer-events-none cursor-pointer ${
+                                                    isSelected
+                                                        ? "bg-white/10 hover:bg-white/25 text-white"
+                                                        : "bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/80 text-slate-500 hover:bg-slate-50 hover:text-slate-700 shadow-sm"
+                                                }`}
+                                                title="เลื่อนขึ้น"
                                             >
                                                 <ArrowUp size={12} />
                                             </button>
+
+                                            {/* Move Down */}
                                             <button
                                                 disabled={index === categories.length - 1}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleMoveCategory(index, "down");
                                                 }}
-                                                className="p-0.5 text-slate-455 hover:text-white rounded disabled:opacity-20"
+                                                className={`w-6 h-6 flex items-center justify-center rounded-lg transition-all active:scale-95 disabled:opacity-20 disabled:pointer-events-none cursor-pointer ${
+                                                    isSelected
+                                                        ? "bg-white/10 hover:bg-white/25 text-white"
+                                                        : "bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/80 text-slate-500 hover:bg-slate-50 hover:text-slate-700 shadow-sm"
+                                                }`}
+                                                title="เลื่อนลง"
                                             >
                                                 <ArrowDown size={12} />
                                             </button>
 
-                                            {/* Action buttons */}
+                                            {/* Edit Category */}
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleOpenCategoryModal("edit", cat);
                                                 }}
-                                                className="p-1 rounded hover:bg-slate-700 text-blue-500 hover:text-blue-400"
+                                                className={`w-6 h-6 flex items-center justify-center rounded-lg transition-all active:scale-95 cursor-pointer ${
+                                                    isSelected
+                                                        ? "bg-white/20 hover:bg-white/35 text-white"
+                                                        : "bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white dark:bg-blue-950/40 dark:text-blue-450 dark:hover:bg-blue-600 dark:hover:text-white border border-blue-100/50 dark:border-blue-900/40 shadow-sm"
+                                                }`}
+                                                title="แก้ไขหมวดหมู่"
                                             >
-                                                <Edit size={11} />
+                                                <Edit size={12} />
                                             </button>
+
+                                            {/* Delete Category */}
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleDeleteCategory(cat.id);
                                                 }}
-                                                className="p-1 rounded hover:bg-slate-700 text-red-500 hover:text-red-400"
+                                                className={`w-6 h-6 flex items-center justify-center rounded-lg transition-all active:scale-95 cursor-pointer ${
+                                                    isSelected
+                                                        ? "bg-red-500/30 hover:bg-red-500/50 text-white"
+                                                        : "bg-red-50 hover:bg-red-600 text-red-600 hover:text-white dark:bg-red-950/40 dark:text-red-450 dark:hover:bg-red-600 dark:hover:text-white border border-red-100/50 dark:border-red-900/40 shadow-sm"
+                                                }`}
+                                                title="ลบหมวดหมู่"
                                             >
-                                                <Trash2 size={11} />
+                                                <Trash2 size={12} />
                                             </button>
                                         </div>
                                     </div>
@@ -668,50 +692,73 @@ export default function AdminDownloads() {
                                                     </div>
                                                 </div>
 
-                                                <div className="flex items-center space-x-1.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                                                    {/* Move buttons */}
+                                                <div className="flex items-center space-x-1 flex-shrink-0">
+                                                    {/* Move Up */}
                                                     <button
                                                         disabled={index === 0}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             handleMoveDoc(index, "up");
                                                         }}
-                                                        className="p-0.5 text-slate-400 hover:text-white rounded disabled:opacity-20"
+                                                        className={`w-6 h-6 flex items-center justify-center rounded-lg transition-all active:scale-95 disabled:opacity-20 disabled:pointer-events-none cursor-pointer ${
+                                                            isSelected
+                                                                ? "bg-white/10 hover:bg-white/25 text-white"
+                                                                : "bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/80 text-slate-500 hover:bg-slate-50 hover:text-slate-700 shadow-sm"
+                                                        }`}
+                                                        title="เลื่อนขึ้น"
                                                     >
                                                         <ArrowUp size={12} />
                                                     </button>
+
+                                                    {/* Move Down */}
                                                     <button
                                                         disabled={index === documents.length - 1}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             handleMoveDoc(index, "down");
                                                         }}
-                                                        className="p-0.5 text-slate-400 hover:text-white rounded disabled:opacity-20"
+                                                        className={`w-6 h-6 flex items-center justify-center rounded-lg transition-all active:scale-95 disabled:opacity-20 disabled:pointer-events-none cursor-pointer ${
+                                                            isSelected
+                                                                ? "bg-white/10 hover:bg-white/25 text-white"
+                                                                : "bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700/80 text-slate-500 hover:bg-slate-50 hover:text-slate-700 shadow-sm"
+                                                        }`}
+                                                        title="เลื่อนลง"
                                                     >
                                                         <ArrowDown size={12} />
                                                     </button>
 
+                                                    {/* Edit Document */}
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             handleOpenDocModal("edit", doc);
                                                         }}
-                                                        className="p-1 rounded text-blue-500 hover:text-blue-400"
+                                                        className={`w-6 h-6 flex items-center justify-center rounded-lg transition-all active:scale-95 cursor-pointer ${
+                                                            isSelected
+                                                                ? "bg-white/20 hover:bg-white/35 text-white"
+                                                                : "bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white dark:bg-blue-950/40 dark:text-blue-450 dark:hover:bg-blue-600 dark:hover:text-white border border-blue-100/50 dark:border-blue-900/40 shadow-sm"
+                                                        }`}
                                                         title="แก้ไขชื่อฟอร์ม"
                                                     >
-                                                        <Edit size={11} />
+                                                        <Edit size={12} />
                                                     </button>
+
+                                                    {/* Delete Document */}
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             handleDeleteDoc(doc.id);
                                                         }}
-                                                        className="p-1 rounded text-red-500 hover:text-red-400"
+                                                        className={`w-6 h-6 flex items-center justify-center rounded-lg transition-all active:scale-95 cursor-pointer ${
+                                                            isSelected
+                                                                ? "bg-red-500/30 hover:bg-red-500/50 text-white"
+                                                                : "bg-red-50 hover:bg-red-600 text-red-600 hover:text-white dark:bg-red-950/40 dark:text-red-450 dark:hover:bg-red-600 dark:hover:text-white border border-red-100/50 dark:border-red-900/40 shadow-sm"
+                                                        }`}
                                                         title="ลบฟอร์ม"
                                                     >
-                                                        <Trash2 size={11} />
+                                                        <Trash2 size={12} />
                                                     </button>
-                                                    <ChevronRight size={14} className="text-slate-400" />
+                                                    <ChevronRight size={14} className={isSelected ? "text-white" : "text-slate-400"} />
                                                 </div>
                                             </div>
                                         );

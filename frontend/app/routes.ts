@@ -7,6 +7,7 @@ export default [
     route("about", "routes/about.tsx"),
     route("about/emblem", "routes/college-emblem.tsx"),
     route("about/songs", "routes/college-songs.tsx"),
+    route("about/statistics", "routes/about-statistics.tsx"),
     route("programs", "routes/programs.tsx"),
     route("programs/:slug", "routes/program-detail.tsx"),
     route("personnel", "routes/personnel.tsx"),
@@ -33,6 +34,7 @@ export default [
         route("jobs", "routes/admin/recruit-test.tsx"),
         route("settings", "routes/admin/site-config.tsx"),
         route("downloads", "routes/admin/downloads.tsx"),
+        route("statistics", "routes/admin/statistics.tsx"),
     ]),
 ] satisfies RouteConfig;
 

@@ -17,8 +17,11 @@ use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\DownloadCategoryController;
 use App\Http\Controllers\DownloadFileController;
 use App\Http\Controllers\DownloadDocumentController;
+use App\Http\Controllers\SchoolStatisticController;
 
 // Public Routes
+Route::get('/school-statistics', [SchoolStatisticController::class, 'index']);
+Route::get('/school-statistics/{year}', [SchoolStatisticController::class, 'showByYear']);
 Route::post('/analytics/log', [AnalyticsController::class, 'log']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/settings', [SiteSettingController::class, 'index']);
@@ -96,4 +99,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('downloads/files/reorder', [DownloadFileController::class, 'reorder']);
     Route::apiResource('downloads/files', DownloadFileController::class)->except(['index', 'show']);
+
+    // Admin School Statistics Routes
+    Route::apiResource('school-statistics', SchoolStatisticController::class)->except(['index', 'showByYear']);
 });

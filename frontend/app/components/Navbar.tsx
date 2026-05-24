@@ -66,7 +66,8 @@ export default function Navbar() {
             submenu: [
                 { name: "ข้อมูลวิทยาลัย", href: "/about", icon: "fas fa-university" },
                 { name: "ตราสัญลักษณ์ประจำวิทยาลัย", href: "/about/emblem", icon: "fas fa-shield-alt" },
-                { name: "เพลงประจำวิทยาลัย", href: "/about/songs", icon: "fas fa-music" }
+                { name: "เพลงประจำวิทยาลัย", href: "/about/songs", icon: "fas fa-music" },
+                { name: "ข้อมูลสถิตินักเรียนและบุคลากร", href: "/about/statistics", icon: "fas fa-chart-bar" }
             ]
         },
         { name: "หลักสูตร", href: "/programs", icon: "fas fa-graduation-cap" },

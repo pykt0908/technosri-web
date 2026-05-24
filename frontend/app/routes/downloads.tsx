@@ -137,6 +137,13 @@ export default function DownloadsPage() {
         doc.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // Pagination calculations
+    const totalPages = Math.ceil(filteredDocuments.length / itemsPerPage);
+    const paginatedDocuments = filteredDocuments.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
     const formatDate = (dateString: string) => {
         if (!dateString) return "";
         return new Date(dateString).toLocaleDateString('th-TH', {

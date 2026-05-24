@@ -132,9 +132,9 @@ export default function Programs({ initialData = [] }: { initialData?: Curriculu
                             ))}
                         </div>
                     ) : (
-                        <div className="overflow-visible">
+                        <div className="overflow-x-auto md:overflow-visible pb-6 md:pb-0 program-scroll snap-x snap-mandatory md:snap-none">
                             <div
-                                className="flex transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
+                                className="flex transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] mobile-scroll-slider"
                                 style={{
                                     transform: `translateX(calc(-${currentIndex * (100 / itemsPerView)}%))`,
                                     gap: '0'
@@ -143,7 +143,7 @@ export default function Programs({ initialData = [] }: { initialData?: Curriculu
                                 {curricula.map((item, index) => (
                                     <div
                                         key={item.id}
-                                        className="px-3 shrink-0 transition-all duration-500"
+                                        className="px-3 shrink-0 transition-all duration-500 mobile-scroll-item snap-start"
                                         style={{ width: `${100 / itemsPerView}%` }}
                                     >
                                         <div className="bg-white dark:bg-gray-900 rounded-[2.5rem] h-full overflow-hidden group border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-700 flex flex-col">
@@ -200,6 +200,35 @@ export default function Programs({ initialData = [] }: { initialData?: Curriculu
                     -webkit-line-clamp: 3;
                     -webkit-box-orient: vertical;
                     overflow: hidden;
+                }
+                .program-scroll::-webkit-scrollbar {
+                    height: 5px;
+                }
+                .program-scroll::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .program-scroll::-webkit-scrollbar-thumb {
+                    background: #cbd5e1;
+                    border-radius: 9999px;
+                }
+                .dark .program-scroll::-webkit-scrollbar-thumb {
+                    background: #334155;
+                }
+                @media (max-width: 767px) {
+                    .mobile-scroll-slider {
+                        transform: none !important;
+                        padding-left: 12px !important;
+                        padding-right: 12px !important;
+                    }
+                    .mobile-scroll-item {
+                        width: 290px !important;
+                        flex-shrink: 0 !important;
+                    }
+                }
+                @media (min-width: 768px) {
+                    .program-scroll::-webkit-scrollbar {
+                        display: none;
+                    }
                 }
             `}</style>
         </section>

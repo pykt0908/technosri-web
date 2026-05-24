@@ -43,6 +43,8 @@ class NewsController extends Controller
             'status' => 'required|in:draft,published',
             'published_at' => 'nullable|date',
             'featured_image' => 'nullable|image|max:10240',
+            'gallery_images' => 'nullable|array',
+            'gallery_images.*' => 'image|max:10240',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
@@ -63,6 +65,16 @@ class NewsController extends Controller
             $validated['featured_image'] = $this->uploadAndConvert($request->file('featured_image'));
         }
 
+        // Handle gallery images
+        $galleryPaths = [];
+        if ($request->hasFile('gallery_images')) {
+            foreach ($request->file('gallery_images') as $imageFile) {
+                $path = $this->uploadAndConvert($imageFile);
+                $galleryPaths[] = $path;
+            }
+        }
+        $validated['gallery'] = count($galleryPaths) > 0 ? $galleryPaths : null;
+
         $news = News::create($validated);
         return response()->json($news, 201);
     }
@@ -78,6 +90,9 @@ class NewsController extends Controller
             'status' => 'required|in:draft,published',
             'published_at' => 'nullable|date',
             'featured_image' => 'nullable|image|max:10240',
+            'gallery_images' => 'nullable|array',
+            'gallery_images.*' => 'image|max:10240',
+            'existing_gallery' => 'nullable|string',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
@@ -94,6 +109,32 @@ class NewsController extends Controller
             $validated['featured_image'] = $this->uploadAndConvert($request->file('featured_image'));
         }
 
+        // Handle gallery updates
+        $existingGallery = [];
+        if ($request->filled('existing_gallery')) {
+            $existingGallery = json_decode($request->input('existing_gallery'), true) ?? [];
+        }
+
+        // Delete removed gallery images from storage
+        if (is_array($news->gallery)) {
+            $deletedImages = array_diff($news->gallery, $existingGallery);
+            foreach ($deletedImages as $deletedImage) {
+                Storage::disk('public')->delete($deletedImage);
+            }
+        }
+
+        // Upload new images
+        $newGalleryPaths = [];
+        if ($request->hasFile('gallery_images')) {
+            foreach ($request->file('gallery_images') as $imageFile) {
+                $path = $this->uploadAndConvert($imageFile);
+                $newGalleryPaths[] = $path;
+            }
+        }
+
+        $finalGallery = array_merge($existingGallery, $newGalleryPaths);
+        $validated['gallery'] = count($finalGallery) > 0 ? $finalGallery : null;
+
         $news->update($validated);
         return response()->json($news);
     }
@@ -103,6 +144,11 @@ class NewsController extends Controller
         $news = News::findOrFail($id);
         if ($news->featured_image) {
             Storage::disk('public')->delete($news->featured_image);
+        }
+        if (is_array($news->gallery)) {
+            foreach ($news->gallery as $galleryImage) {
+                Storage::disk('public')->delete($galleryImage);
+            }
         }
         $news->delete();
         return response()->json(null, 204);
@@ -132,6 +178,11 @@ class NewsController extends Controller
         }
 
         if ($image) {
+            // Convert palette/indexed images (e.g. PNG-8) to truecolor to avoid "Palette image not supported by webp" error
+            if (!imageistruecolor($image)) {
+                imagepalettetotruecolor($image);
+            }
+
             $storagePath = storage_path('app/public/news/' . $filename);
             if (!file_exists(dirname($storagePath))) {
                 mkdir(dirname($storagePath), 0755, true);

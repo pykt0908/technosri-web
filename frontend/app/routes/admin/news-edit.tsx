@@ -42,7 +42,7 @@ const HEADINGS = [
     { label: "หัวข้อ 4", level: 4 },
 ];
 
-const MenuBar = ({ editor, imageInputRef }: { editor: any, imageInputRef: React.RefObject<HTMLInputElement> }) => {
+const MenuBar = ({ editor, imageInputRef }: { editor: any, imageInputRef: React.RefObject<HTMLInputElement | null> }) => {
     const [uploading, setUploading] = useState(false);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -240,7 +240,40 @@ export default function NewsEdit() {
     const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
     const [loading, setLoading] = useState(true);
 
+    const [existingGallery, setExistingGallery] = useState<string[]>([]);
+    const [newGalleryImages, setNewGalleryImages] = useState<File[]>([]);
+    const [newGalleryPreviews, setNewGalleryPreviews] = useState<string[]>([]);
+
     const editorImageRef = useRef<HTMLInputElement>(null);
+
+    const handleNewGalleryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files) return;
+        
+        const newFiles = Array.from(files);
+        setNewGalleryImages(prev => [...prev, ...newFiles]);
+        
+        const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+        setNewGalleryPreviews(prev => [...prev, ...newPreviews]);
+    };
+
+    const removeNewGalleryImage = (index: number) => {
+        setNewGalleryImages(prev => prev.filter((_, i) => i !== index));
+        setNewGalleryPreviews(prev => {
+            URL.revokeObjectURL(prev[index]);
+            return prev.filter((_, i) => i !== index);
+        });
+    };
+
+    const removeExistingGalleryImage = (index: number) => {
+        setExistingGallery(prev => prev.filter((_, i) => i !== index));
+    };
+
+    useEffect(() => {
+        return () => {
+            newGalleryPreviews.forEach(url => URL.revokeObjectURL(url));
+        };
+    }, [newGalleryPreviews]);
 
     const generateSlug = (val: string) => {
         return val
@@ -320,6 +353,7 @@ export default function NewsEdit() {
                 if (data.featured_image) {
                     setImagePreview(`${import.meta.env.VITE_API_URL}/storage/${data.featured_image}`);
                 }
+                setExistingGallery(data.gallery || []);
                 if (editor) {
                     editor.commands.setContent(data.content);
                 }
@@ -359,6 +393,14 @@ export default function NewsEdit() {
         
         if (featuredImage) {
             formData.append("featured_image", featuredImage);
+        }
+
+        formData.append("existing_gallery", JSON.stringify(existingGallery));
+
+        if (newGalleryImages.length > 0) {
+            newGalleryImages.forEach(file => {
+                formData.append("gallery_images[]", file);
+            });
         }
 
         const loadingToast = toast.loading("กำลังอัปเดตข้อมูลข่าวสาร...");
@@ -497,6 +539,69 @@ export default function NewsEdit() {
                                 const file = e.target.files?.[0];
                                 if (file) { setFeaturedImage(file); setImagePreview(URL.createObjectURL(file)); }
                             }} />
+                        </div>
+                    </div>
+
+                    {/* Gallery Images Card */}
+                    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+                            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center">
+                                <LayoutGrid size={14} className="mr-2 text-primary-500" /> คลังรูปภาพประกอบ (Gallery)
+                            </h3>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div 
+                                onClick={() => document.getElementById('edit-gallery-upload-vfinal')?.click()} 
+                                className="py-8 bg-slate-50 dark:bg-slate-800 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100/50 dark:hover:bg-slate-800/80 transition-all group"
+                            >
+                                <PlusSquare className="text-slate-300 group-hover:text-primary-500 transition-colors mb-2" size={32} />
+                                <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-500 uppercase tracking-widest transition-colors">เพิ่มรูปภาพในคลังภาพ</span>
+                                <span className="text-[8px] text-slate-400 mt-1 font-semibold">คลิกเพื่อเลือกไฟล์รูปภาพเพิ่มเติม</span>
+                            </div>
+                            <input 
+                                type="file" 
+                                id="edit-gallery-upload-vfinal" 
+                                className="hidden" 
+                                accept="image/*" 
+                                multiple 
+                                onChange={handleNewGalleryChange} 
+                            />
+
+                            {(existingGallery.length > 0 || newGalleryPreviews.length > 0) && (
+                                <div className="grid grid-cols-3 gap-2.5 pt-2">
+                                    {/* Existing Gallery Images */}
+                                    {existingGallery.map((path, idx) => (
+                                        <div key={`existing-${idx}`} className="aspect-square bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden relative group border border-slate-100 dark:border-slate-700 shadow-sm">
+                                            <img src={`${import.meta.env.VITE_API_URL}/storage/${path}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" alt={`Existing ${idx + 1}`} />
+                                            <button 
+                                                type="button"
+                                                onClick={() => removeExistingGalleryImage(idx)} 
+                                                className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500/85 hover:bg-red-600 text-white flex items-center justify-center active:scale-95 transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-md"
+                                                title="ลบรูปภาพนี้จากเซิร์ฟเวอร์"
+                                            >
+                                                <X size={12} />
+                                            </button>
+                                            <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-slate-900/80 text-[8px] text-slate-300 font-bold tracking-wider">เซิร์ฟเวอร์</span>
+                                        </div>
+                                    ))}
+
+                                    {/* Newly Added Gallery Images */}
+                                    {newGalleryPreviews.map((previewUrl, idx) => (
+                                        <div key={`new-${idx}`} className="aspect-square bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden relative group border border-slate-100 dark:border-slate-700 shadow-sm animate-fade-in">
+                                            <img src={previewUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" alt={`New ${idx + 1}`} />
+                                            <button 
+                                                type="button"
+                                                onClick={() => removeNewGalleryImage(idx)} 
+                                                className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500/85 hover:bg-red-600 text-white flex items-center justify-center active:scale-95 transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-md"
+                                                title="ลบรูปภาพนี้"
+                                            >
+                                                <X size={12} />
+                                            </button>
+                                            <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-primary-600/95 text-[8px] text-white font-bold tracking-wider">ใหม่</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
 

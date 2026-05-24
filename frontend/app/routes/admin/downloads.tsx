@@ -13,7 +13,11 @@ import {
     Search,
     ExternalLink,
     Loader2,
-    ChevronRight
+    ChevronRight,
+    FileSpreadsheet,
+    Archive,
+    Image,
+    Music
 } from "lucide-react";
 
 interface Category {
@@ -54,6 +58,17 @@ export default function AdminDownloads() {
 
     const [loadingCategories, setLoadingCategories] = useState(true);
     const [loadingDocuments, setLoadingDocuments] = useState(false);
+
+    const getFileIcon = (filePath: string) => {
+        const ext = filePath.split('.').pop()?.toLowerCase();
+        if (ext === 'pdf') return <FileText className="text-red-500 dark:text-red-400" size={15} />;
+        if (['doc', 'docx'].includes(ext || '')) return <FileText className="text-blue-500 dark:text-blue-400" size={15} />;
+        if (['xls', 'xlsx'].includes(ext || '')) return <FileSpreadsheet className="text-green-500 dark:text-green-400" size={15} />;
+        if (['zip', 'rar', '7z'].includes(ext || '')) return <Archive className="text-amber-500 dark:text-amber-400" size={15} />;
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')) return <Image className="text-purple-500 dark:text-purple-400" size={15} />;
+        if (['mp3', 'wav', 'ogg', 'm4a', 'aac'].includes(ext || '')) return <Music className="text-violet-500 dark:text-violet-400" size={15} />;
+        return <File className="text-slate-400 dark:text-slate-500 flex-shrink-0" size={15} />;
+    };
 
     // Modals state
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -779,7 +794,7 @@ export default function AdminDownloads() {
                 <div className="xl:col-span-5 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-100/50 dark:shadow-none">
                     {selectedDocumentId === null ? (
                         <div className="text-center py-20 text-slate-400 text-xs font-bold">
-                            เลือกรายชื่อฟอร์มตรงกลางเพื่อบริหารจัดการอัปโหลดไฟล์รูปแบบ (.pdf, .docx, .zip)
+                            เลือกรายชื่อฟอร์มตรงกลางเพื่อบริหารจัดการอัปโหลดไฟล์รูปแบบ (.pdf, .docx, .zip, .mp3, .wav)
                         </div>
                     ) : (
                         <>
@@ -817,7 +832,7 @@ export default function AdminDownloads() {
                                             <tr key={file.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-850/35 transition-colors">
                                                 <td className="px-4 py-3.5">
                                                     <div className="flex items-center space-x-2.5 max-w-[220px] truncate">
-                                                        <File className="text-slate-400 dark:text-slate-500 flex-shrink-0" size={15} />
+                                                        {getFileIcon(file.file_path)}
                                                         <div className="truncate">
                                                             <p className="font-bold text-slate-700 dark:text-slate-200 truncate">{file.title}</p>
                                                             <a 
@@ -1019,7 +1034,7 @@ export default function AdminDownloads() {
                                                 setSelectedFile(e.target.files[0]);
                                             }
                                         }}
-                                        accept=".pdf,.docx,.doc,.xls,.xlsx,.zip,.rar,.png,.jpg,.jpeg"
+                                        accept=".pdf,.docx,.doc,.xls,.xlsx,.zip,.rar,.png,.jpg,.jpeg,.mp3,.wav,.ogg,.m4a,.aac"
                                         className="w-full bg-slate-50 dark:bg-slate-855 border border-slate-100 dark:border-slate-800 rounded-xl px-4 py-3 text-xs font-bold text-slate-550 dark:text-slate-400 outline-none focus:ring-2 focus:ring-primary-500"
                                     />
                                 </div>
@@ -1033,7 +1048,7 @@ export default function AdminDownloads() {
                                                 setSelectedFile(e.target.files[0]);
                                             }
                                         }}
-                                        accept=".pdf,.docx,.doc,.xls,.xlsx,.zip,.rar,.png,.jpg,.jpeg"
+                                        accept=".pdf,.docx,.doc,.xls,.xlsx,.zip,.rar,.png,.jpg,.jpeg,.mp3,.wav,.ogg,.m4a,.aac"
                                         className="w-full bg-slate-50 dark:bg-slate-855 border border-slate-100 dark:border-slate-800 rounded-xl px-4 py-3 text-xs font-bold text-slate-550 dark:text-slate-400 outline-none focus:ring-2 focus:ring-primary-500"
                                     />
                                     <p className="text-[9px] text-slate-450 font-bold mt-1.5 italic">ไฟล์เดิม: /storage/{editingFile?.file_path}</p>

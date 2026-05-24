@@ -15,6 +15,7 @@ class News extends Model
         'slug',
         'content',
         'featured_image',
+        'gallery',
         'status',
         'published_at',
         'meta_title',
@@ -24,6 +25,7 @@ class News extends Model
 
     protected $casts = [
         'published_at' => 'datetime',
+        'gallery' => 'array',
     ];
 
     public function author()

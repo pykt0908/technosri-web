@@ -27,6 +27,26 @@ export default function ProgramGrid() {
 
     return (
         <section className="py-24 bg-white dark:bg-gray-950">
+            <style>{`
+                .program-scroll::-webkit-scrollbar {
+                    height: 5px;
+                }
+                .program-scroll::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .program-scroll::-webkit-scrollbar-thumb {
+                    background: #cbd5e1;
+                    border-radius: 9999px;
+                }
+                .dark .program-scroll::-webkit-scrollbar-thumb {
+                    background: #334155;
+                }
+                @media (min-width: 640px) {
+                    .program-scroll::-webkit-scrollbar {
+                        display: none;
+                    }
+                }
+            `}</style>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <Reveal className="text-center mb-16">
                     <span className="text-primary-500 font-black tracking-[0.3em] uppercase text-sm mb-4 block">Sriracha Technology College Curriculum</span>
@@ -53,7 +73,7 @@ export default function ProgramGrid() {
                     </div>
                 </Reveal>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="program-scroll flex overflow-x-auto pb-6 gap-6 snap-x snap-mandatory sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-8 sm:pb-0">
                     <AnimatePresence mode="wait">
                         {programData[activeTab].map((item, index) => (
                             <motion.div
@@ -62,7 +82,7 @@ export default function ProgramGrid() {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
                                 transition={{ duration: 0.5, delay: index * 0.05 }}
-                                className="group bg-white dark:bg-gray-900 rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-800"
+                                className="group bg-white dark:bg-gray-900 rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-800 w-[280px] sm:w-auto shrink-0 sm:shrink snap-start sm:snap-none"
                             >
                                 {/* Image Container */}
                                 <div className="relative h-64 overflow-hidden">

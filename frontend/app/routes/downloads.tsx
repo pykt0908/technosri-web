@@ -9,6 +9,7 @@ const FileSpreadsheet = Lucide.FileSpreadsheet || Lucide.File;
 const Archive = Lucide.Archive || Lucide.File;
 const FileImage = Lucide.Image || Lucide.File;
 const DefaultFileIcon = Lucide.File || Lucide.File;
+const Music = Lucide.Music || Lucide.File;
 const Search = Lucide.Search || Lucide.Search;
 const ArrowRight = Lucide.ArrowRight || Lucide.ChevronRight;
 const Download = Lucide.Download || Lucide.ArrowDown;
@@ -115,7 +116,23 @@ export default function DownloadsPage() {
         if (['xls', 'xlsx'].includes(ext || '')) return <FileSpreadsheet className="text-green-500 dark:text-green-400" size={18} />;
         if (['zip', 'rar', '7z'].includes(ext || '')) return <Archive className="text-amber-500 dark:text-amber-400" size={18} />;
         if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')) return <FileImage className="text-purple-500 dark:text-purple-400" size={18} />;
+        if (['mp3', 'wav', 'ogg', 'm4a', 'aac'].includes(ext || '')) return <Music className="text-violet-500 dark:text-violet-400" size={18} />;
         return <DefaultFileIcon className="text-slate-400 dark:text-slate-500" size={18} />;
+    };
+
+    const getDocumentIcon = (files: DownloadFileItem[]) => {
+        if (!files || files.length === 0) {
+            return <FileText className="text-primary-600 dark:text-primary-400" size={32} />;
+        }
+        const firstFile = files[0];
+        const ext = firstFile.file_path.split('.').pop()?.toLowerCase() || '';
+        if (ext === 'pdf') return <FileText className="text-red-500 dark:text-red-400" size={32} />;
+        if (['doc', 'docx'].includes(ext)) return <FileText className="text-blue-500 dark:text-blue-400" size={32} />;
+        if (['xls', 'xlsx'].includes(ext)) return <FileSpreadsheet className="text-green-500 dark:text-green-400" size={32} />;
+        if (['zip', 'rar', '7z'].includes(ext)) return <Archive className="text-amber-500 dark:text-amber-400" size={32} />;
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) return <FileImage className="text-purple-500 dark:text-purple-400" size={32} />;
+        if (['mp3', 'wav', 'ogg', 'm4a', 'aac'].includes(ext)) return <Music className="text-violet-500 dark:text-violet-400" size={32} />;
+        return <DefaultFileIcon className="text-primary-600 dark:text-primary-400" size={32} />;
     };
 
     const handleDownload = (fileId: number) => {
@@ -260,8 +277,8 @@ export default function DownloadsPage() {
                                             
                                             {/* Left: Icon & Document Title */}
                                             <div className="flex items-center space-x-4 min-w-0 flex-1">
-                                                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:scale-105 transition-transform duration-300 shrink-0">
-                                                    <Lucide.FileText className="text-primary-600 dark:text-primary-400" size={32} />
+                                                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:scale-105 transition-transform duration-300 shrink-0 flex items-center justify-center">
+                                                    {getDocumentIcon(doc.files)}
                                                 </div>
                                                 <div className="space-y-1.5 min-w-0 flex-1">
                                                     <h3 className="text-lg font-black text-slate-850 dark:text-white leading-snug group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
@@ -289,6 +306,8 @@ export default function DownloadsPage() {
                                                                     ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-500/25"
                                                                     : ['xls', 'xlsx'].includes(ext || '')
                                                                     ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-500/25"
+                                                                    : ['mp3', 'wav', 'ogg', 'm4a', 'aac'].includes(ext || '')
+                                                                    ? "bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 shadow-lg shadow-violet-500/25"
                                                                     : "bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 shadow-lg shadow-slate-500/20"
                                                             }`}
                                                             title={`${file.title} • ดาวน์โหลด ${file.download_count} ครั้ง`}

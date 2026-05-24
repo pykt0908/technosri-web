@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
     Calendar, 
     User, 
@@ -12,7 +13,9 @@ import {
     ArrowLeft,
     Share,
     ExternalLink,
-    Bookmark
+    Bookmark,
+    X,
+    LayoutGrid
 } from "lucide-react";
 import Reveal from "../components/Reveal";
 import toast from "react-hot-toast";
@@ -22,6 +25,7 @@ interface NewsItem {
     title: string;
     content: string;
     featured_image: string | null;
+    gallery?: string[] | null;
     published_at: string; // ใช้ published_at
     created_at: string;
     author?: { name: string };
@@ -34,6 +38,46 @@ export default function NewsDetail() {
     const navigate = useNavigate();
     const [news, setNews] = useState<NewsItem | null>(null);
     const [loading, setLoading] = useState(true);
+    
+    const [activeImageIdx, setActiveImageIdx] = useState<number | null>(null);
+
+    const openLightbox = (index: number) => {
+        setActiveImageIdx(index);
+        document.body.style.overflow = "hidden";
+    };
+
+    const closeLightbox = () => {
+        setActiveImageIdx(null);
+        document.body.style.overflow = "unset";
+    };
+
+    const nextImage = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        if (news?.gallery && activeImageIdx !== null) {
+            setActiveImageIdx((activeImageIdx + 1) % news.gallery.length);
+        }
+    };
+
+    const prevImage = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        if (news?.gallery && activeImageIdx !== null) {
+            setActiveImageIdx((activeImageIdx - 1 + news.gallery.length) % news.gallery.length);
+        }
+    };
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (activeImageIdx === null) return;
+            if (e.key === "Escape") closeLightbox();
+            if (e.key === "ArrowRight") nextImage();
+            if (e.key === "ArrowLeft") prevImage();
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [activeImageIdx, news?.gallery]);
 
     useEffect(() => {
         const fetchNewsDetail = async () => {
@@ -83,6 +127,19 @@ export default function NewsDetail() {
             <style>{`
                 .tiptap-content {
                     white-space: pre-wrap;
+                }
+                .gallery-scroll::-webkit-scrollbar {
+                    height: 6px;
+                }
+                .gallery-scroll::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .gallery-scroll::-webkit-scrollbar-thumb {
+                    background: #cbd5e1;
+                    border-radius: 9999px;
+                }
+                .dark .gallery-scroll::-webkit-scrollbar-thumb {
+                    background: #334155;
                 }
                 .tiptap-content p {
                     min-height: 1.5rem;
@@ -211,12 +268,113 @@ export default function NewsDetail() {
                     </div>
                 </Reveal>
 
+                {/* News Gallery Grid with Overlay (Placed beautifully under the featured image) */}
+                {news.gallery && news.gallery.length > 0 && (
+                    <Reveal delay={0.25}>
+                        <div className="mb-16">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                {news.gallery.slice(0, 4).map((path, idx) => {
+                                    const isLast = news.gallery.length > 4 && idx === 3;
+                                    return (
+                                        <div 
+                                            key={idx} 
+                                            onClick={() => openLightbox(idx)}
+                                            className="aspect-[4/3] bg-slate-50 dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800/80 shadow-sm cursor-pointer relative group"
+                                        >
+                                            <img 
+                                                src={`${import.meta.env.VITE_API_URL}/storage/${path}`} 
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                                                alt={`Gallery image ${idx + 1}`} 
+                                            />
+                                            {isLast ? (
+                                                <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[1px] flex flex-col items-center justify-center text-white transition-all duration-300 group-hover:bg-slate-950/50">
+                                                    <span className="text-3xl md:text-4xl font-black tracking-wider">+{news.gallery.length - 3}</span>
+                                                    <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest mt-1 text-slate-300">รูปภาพ</span>
+                                                </div>
+                                            ) : (
+                                                <div className="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                                    <span className="w-10 h-10 rounded-full bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-white flex items-center justify-center shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                                                        <Share size={16} className="rotate-45" />
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </Reveal>
+                )}
+
                 <article className="prose prose-slate dark:prose-invert lg:prose-xl max-w-none prose-img:rounded-3xl prose-img:shadow-none prose-img:border-none prose-headings:font-black prose-headings:tracking-tight prose-a:text-primary-600 prose-blockquote:border-primary-500 prose-blockquote:bg-slate-50 dark:prose-blockquote:bg-slate-900 prose-blockquote:py-2 prose-blockquote:rounded-r-2xl">
                     <div 
                         className="tiptap-content leading-relaxed text-slate-700 dark:text-slate-300"
                         dangerouslySetInnerHTML={{ __html: news.content }} 
                     />
                 </article>
+
+                {/* Premium Lightbox Modal */}
+                <AnimatePresence>
+                    {activeImageIdx !== null && news.gallery && (
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={closeLightbox}
+                            className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
+                        >
+                            <button 
+                                onClick={closeLightbox}
+                                className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur transition-all active:scale-95 cursor-pointer z-10"
+                                title="ปิดหน้าต่าง (ESC)"
+                            >
+                                <X size={20} />
+                            </button>
+
+                            {/* Left Navigation Arrow */}
+                            {news.gallery.length > 1 && (
+                                <button 
+                                    onClick={prevImage}
+                                    className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur transition-all active:scale-95 cursor-pointer z-10"
+                                    title="ภาพก่อนหน้า (←)"
+                                >
+                                    <ChevronLeft size={24} />
+                                </button>
+                            )}
+
+                            {/* Main High-Res Image Container */}
+                            <motion.div 
+                                initial={{ scale: 0.95 }}
+                                animate={{ scale: 1 }}
+                                exit={{ scale: 0.95 }}
+                                className="max-w-5xl max-h-[85vh] overflow-hidden rounded-2xl border border-white/10 shadow-2xl relative"
+                                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking image
+                            >
+                                <img 
+                                    src={`${import.meta.env.VITE_API_URL}/storage/${news.gallery[activeImageIdx]}`} 
+                                    className="w-full h-auto max-h-[85vh] object-contain" 
+                                    alt={`Gallery detail ${activeImageIdx + 1}`} 
+                                />
+                                
+                                {/* Photo caption overlay */}
+                                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 text-white text-center">
+                                    <p className="font-bold text-sm tracking-wide">ภาพที่ {activeImageIdx + 1} จากทั้งหมด {news.gallery.length} ภาพ</p>
+                                </div>
+                            </motion.div>
+
+                            {/* Right Navigation Arrow */}
+                            {news.gallery.length > 1 && (
+                                <button 
+                                    onClick={nextImage}
+                                    className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur transition-all active:scale-95 cursor-pointer z-10"
+                                    title="ภาพถัดไป (→)"
+                                >
+                                    <ChevronLeft size={24} className="rotate-180" />
+                                </button>
+                            )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
         </div>
     );

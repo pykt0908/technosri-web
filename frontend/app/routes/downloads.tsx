@@ -13,6 +13,8 @@ const Search = Lucide.Search || Lucide.Search;
 const ArrowRight = Lucide.ArrowRight || Lucide.ChevronRight;
 const Download = Lucide.Download || Lucide.ArrowDown;
 const Calendar = Lucide.Calendar || Lucide.Clock;
+const ChevronLeft = Lucide.ChevronLeft || Lucide.ChevronLeft;
+const ChevronRight = Lucide.ChevronRight || Lucide.ChevronRight;
 
 interface DownloadFileItem {
     id: number;
@@ -51,6 +53,8 @@ export default function DownloadsPage() {
     const [loadingCategories, setLoadingCategories] = useState(true);
     const [loadingFiles, setLoadingFiles] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6;
 
     // Fetch all categories on mount
     useEffect(() => {
@@ -84,6 +88,7 @@ export default function DownloadsPage() {
         if (cat) {
             setCurrentCategory(cat);
             fetchCategoryFiles(cat.slug);
+            setCurrentPage(1); // Reset page on category switch
         } else {
             // Slug not found in categories list, default to first
             navigate(`/downloads/${categories[0].slug}`, { replace: true });
@@ -225,7 +230,10 @@ export default function DownloadsPage() {
                                 type="text" 
                                 placeholder={currentCategory ? `ค้นหาเอกสารในหมวดหมู่ "${currentCategory.name}"...` : "ค้นหาเอกสารดาวน์โหลด..."} 
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    setCurrentPage(1); // Reset page on typing search query
+                                }}
                                 className="w-full pl-14 pr-6 py-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl shadow-xl shadow-slate-200/30 dark:shadow-none focus:ring-2 focus:ring-primary-500 outline-none transition-all text-sm font-bold text-slate-700 dark:text-white"
                             />
                         </div>
@@ -239,7 +247,7 @@ export default function DownloadsPage() {
                             </div>
                         ) : (
                             <div className="space-y-6">
-                                {filteredDocuments.map((doc, index) => (
+                                {paginatedDocuments.map((doc, index) => (
                                     <Reveal key={doc.id} delay={index * 0.05}>
                                         <div className="group bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 hover:shadow-2xl hover:shadow-primary-500/5 dark:hover:shadow-none transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-6">
                                             
@@ -264,7 +272,7 @@ export default function DownloadsPage() {
                                                 {doc.files.map(file => {
                                                     const ext = file.file_path.split('.').pop()?.toLowerCase();
                                                     return (
-                                                                                        <button
+                                                        <button
                                                             key={file.id}
                                                             onClick={() => handleDownload(file.id)}
                                                             className={`flex-1 md:flex-initial px-5 py-3.5 rounded-2xl text-[11px] font-extrabold uppercase tracking-wider transition-all duration-300 flex items-center justify-center space-x-2 text-white shadow-xl active:scale-95 hover:scale-[1.02] cursor-pointer shrink-0 ${
@@ -274,7 +282,7 @@ export default function DownloadsPage() {
                                                                     ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-500/25"
                                                                     : ['xls', 'xlsx'].includes(ext || '')
                                                                     ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-500/25"
-                                                                    : "bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 shadow-lg shadow-slate-550/20"
+                                                                    : "bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 shadow-lg shadow-slate-500/20"
                                                             }`}
                                                             title={`${file.title} • ดาวน์โหลด ${file.download_count} ครั้ง`}
                                                         >
@@ -293,13 +301,52 @@ export default function DownloadsPage() {
                                     </Reveal>
                                 ))}
 
+                                {/* Pagination Controls */}
+                                {totalPages > 1 && (
+                                    <div className="flex items-center justify-center space-x-2 pt-8">
+                                        <button
+                                            disabled={currentPage === 1}
+                                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                            className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/80 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm"
+                                        >
+                                            <ChevronLeft size={16} />
+                                        </button>
+
+                                        {Array.from({ length: totalPages }, (_, idx) => {
+                                            const pageNum = idx + 1;
+                                            const isActive = pageNum === currentPage;
+                                            return (
+                                                <button
+                                                    key={pageNum}
+                                                    onClick={() => setCurrentPage(pageNum)}
+                                                    className={`w-11 h-11 rounded-2xl text-xs font-black transition-all duration-300 shadow-sm cursor-pointer ${
+                                                        isActive
+                                                            ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md shadow-primary-500/20 scale-105"
+                                                            : "bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:scale-[1.02]"
+                                                    }`}
+                                                >
+                                                    {pageNum}
+                                                </button>
+                                            );
+                                        })}
+
+                                        <button
+                                            disabled={currentPage === totalPages}
+                                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                            className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/80 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm"
+                                        >
+                                            <ChevronRight size={16} />
+                                        </button>
+                                    </div>
+                                )}
+
                                 {/* Empty category files state */}
                                 {filteredDocuments.length === 0 && (
                                     <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-md">
                                         <div className="text-slate-300 dark:text-slate-700 mb-4">
                                             <Lucide.File className="mx-auto" size={64} />
                                         </div>
-                                        <h3 className="text-lg font-black text-slate-800 dark:text-white">
+                                        <h3 className="text-lg font-black text-slate-850 dark:text-white">
                                             ไม่พบเอกสารดาวน์โหลด
                                         </h3>
                                         <p className="text-sm text-slate-400 mt-1">

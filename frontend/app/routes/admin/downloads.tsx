@@ -539,15 +539,15 @@ export default function AdminDownloads() {
                                         onClick={() => setSelectedCategoryId(cat.id)}
                                         className={`group flex items-center justify-between p-3.5 rounded-2xl cursor-pointer border transition-all duration-200 ${
                                             isSelected
-                                                ? "bg-slate-950 text-white border-slate-950 dark:bg-slate-850 dark:border-slate-850"
+                                                ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white border-primary-600 shadow-md shadow-primary-500/15"
                                                 : "bg-slate-50 dark:bg-slate-900/60 border-slate-100 dark:border-slate-800/80 text-slate-700 dark:text-slate-350 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 hover:-translate-x-1"
                                         }`}
                                     >
                                         <div className="flex items-center space-x-2 truncate">
-                                            <Folder className={isSelected ? "text-primary-400" : "text-slate-450 group-hover:text-primary-500"} size={15} />
+                                            <Folder className={isSelected ? "text-white" : "text-slate-450 group-hover:text-primary-500"} size={15} />
                                             <div className="truncate">
                                                 <p className="font-bold text-xs truncate">{cat.name}</p>
-                                                <p className="text-[9px] font-mono text-slate-400">/{cat.slug}</p>
+                                                <p className={`text-[9px] font-mono ${isSelected ? "text-primary-100" : "text-slate-400"}`}>/{cat.slug}</p>
                                             </div>
                                         </div>
 
@@ -655,15 +655,15 @@ export default function AdminDownloads() {
                                                 onClick={() => setSelectedDocumentId(doc.id)}
                                                 className={`group flex items-center justify-between p-3.5 rounded-2xl cursor-pointer border transition-all duration-200 ${
                                                     isSelected
-                                                        ? "bg-slate-900 border-slate-900 text-white dark:bg-slate-800 dark:border-slate-800"
+                                                        ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white border-primary-600 shadow-md shadow-primary-500/15"
                                                         : "bg-slate-50 dark:bg-slate-900/60 border-slate-100 dark:border-slate-800/80 text-slate-700 dark:text-slate-350 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 hover:-translate-x-1"
                                                 }`}
                                             >
                                                 <div className="flex items-center space-x-3 truncate flex-1 min-w-0">
-                                                    <FileText className={isSelected ? "text-primary-400" : "text-slate-450"} size={16} />
+                                                    <FileText className={isSelected ? "text-white" : "text-slate-450"} size={16} />
                                                     <div className="truncate">
-                                                        <p className="font-bold text-xs truncate text-slate-800 dark:text-slate-100 group-hover:text-primary-500 dark:group-hover:text-primary-400">{doc.title}</p>
-                                                        <p className="text-[9px] text-slate-400 font-bold mt-0.5">มีไฟล์แนบอยู่: {doc.files.length} รูปแบบ</p>
+                                                        <p className={`font-bold text-xs truncate ${isSelected ? "text-white" : "text-slate-800 dark:text-slate-100 group-hover:text-primary-500 dark:group-hover:text-primary-400"}`}>{doc.title}</p>
+                                                        <p className={`text-[9px] font-bold mt-0.5 ${isSelected ? "text-primary-100" : "text-slate-400"}`}>มีไฟล์แนบอยู่: {doc.files.length} รูปแบบ</p>
                                                     </div>
                                                 </div>
 

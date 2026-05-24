@@ -5,11 +5,14 @@ export default [
     route("news", "routes/news-all.tsx"),
     route("news/:slug", "routes/news-detail.tsx"),
     route("about", "routes/about.tsx"),
+    route("about/emblem", "routes/college-emblem.tsx"),
+    route("about/songs", "routes/college-songs.tsx"),
     route("programs", "routes/programs.tsx"),
     route("programs/:slug", "routes/program-detail.tsx"),
     route("personnel", "routes/personnel.tsx"),
     route("join-us", "routes/join-us.tsx"),
     route("contact", "routes/contact.tsx"),
+    route("downloads/:slug?", "routes/downloads.tsx"),
     route("privacy-policy", "routes/privacy-policy.tsx"),
     route("terms-of-service", "routes/terms-of-service.tsx"),
     route("sitemap", "routes/sitemap.tsx"),
@@ -29,6 +32,7 @@ export default [
         route("personnel", "routes/admin/personnel.tsx"),
         route("jobs", "routes/admin/recruit-test.tsx"),
         route("settings", "routes/admin/site-config.tsx"),
+        route("downloads", "routes/admin/downloads.tsx"),
     ]),
 ] satisfies RouteConfig;
 

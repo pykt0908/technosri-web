@@ -9,6 +9,9 @@ export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
     const [settings, setSettings] = useState<any>({});
+    const [activeHoveredMenu, setActiveHoveredMenu] = useState<string | null>(null);
+    const [openMobileSubmenu, setOpenMobileSubmenu] = useState<string | null>(null);
+    const [downloadCategories, setDownloadCategories] = useState<any[]>([]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -25,17 +28,60 @@ export default function Navbar() {
             }
         };
 
+        const fetchDownloadCategories = async () => {
+            try {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/downloads/categories`);
+                const data = await res.json();
+                setDownloadCategories(data);
+            } catch (err) {
+                console.error("Failed to fetch download categories");
+            }
+        };
+
         window.addEventListener("scroll", handleScroll);
         fetchSettings();
+        fetchDownloadCategories();
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    const navLinks = [
+    interface SubmenuItem {
+        name: string;
+        href: string;
+        icon: string;
+    }
+
+    interface NavLinkItem {
+        name: string;
+        href: string;
+        icon: string;
+        submenu?: SubmenuItem[];
+    }
+
+    const navLinks: NavLinkItem[] = [
         { name: "หน้าแรก", href: "/", icon: "fas fa-home" },
-        { name: "เกี่ยวกับเรา", href: "/about", icon: "fas fa-info-circle" },
+        { 
+            name: "เกี่ยวกับเรา", 
+            href: "/about", 
+            icon: "fas fa-info-circle",
+            submenu: [
+                { name: "ข้อมูลวิทยาลัย", href: "/about", icon: "fas fa-university" },
+                { name: "ตราสัญลักษณ์ประจำวิทยาลัย", href: "/about/emblem", icon: "fas fa-shield-alt" },
+                { name: "เพลงประจำวิทยาลัย", href: "/about/songs", icon: "fas fa-music" }
+            ]
+        },
         { name: "หลักสูตร", href: "/programs", icon: "fas fa-graduation-cap" },
         { name: "บุคลากร", href: "/personnel", icon: "fas fa-users" },
         { name: "ร่วมงานกับเรา", href: "/join-us", icon: "fas fa-briefcase" },
+        ...(downloadCategories.length > 0 ? [{
+            name: "ดาวน์โหลด",
+            href: `/downloads/${downloadCategories[0].slug}`,
+            icon: "fas fa-cloud-download-alt",
+            submenu: downloadCategories.map(cat => ({
+                name: cat.name,
+                href: `/downloads/${cat.slug}`,
+                icon: "fas fa-file-download"
+            }))
+        }] : []),
         { name: "ติดต่อเรา", href: "/contact", icon: "fas fa-envelope" },
     ];
 
@@ -64,20 +110,77 @@ export default function Navbar() {
 
                     {/* Center: Navigation Links (Desktop) */}
                     <div className="hidden lg:flex flex-[3] justify-center items-center space-x-6" role="menubar">
-                        {navLinks.map((link) => (
-                            <NavLink
-                                key={link.href}
-                                to={link.href}
-                                role="menuitem"
-                                className={({ isActive }) =>
-                                    `text-[0.8rem] font-bold transition-colors flex items-center space-x-2 ${isActive ? "text-primary-600" : "text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400"
-                                    }`
-                                }
-                            >
-                                <i className={`${link.icon} text-xs opacity-60`} aria-hidden="true"></i>
-                                <span>{link.name}</span>
-                            </NavLink>
-                        ))}
+                        {navLinks.map((link) => {
+                            if (link.submenu) {
+                                const isHovered = activeHoveredMenu === link.name;
+                                return (
+                                    <div
+                                        key={link.name}
+                                        className="relative py-4"
+                                        onMouseEnter={() => setActiveHoveredMenu(link.name)}
+                                        onMouseLeave={() => setActiveHoveredMenu(null)}
+                                    >
+                                        <button
+                                            className="text-[0.8rem] font-bold transition-colors flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none"
+                                            aria-haspopup="true"
+                                            aria-expanded={isHovered}
+                                        >
+                                            <i className={`${link.icon} text-xs opacity-60`} aria-hidden="true"></i>
+                                            <span>{link.name}</span>
+                                            <i className={`fas fa-chevron-down text-[9px] opacity-60 transition-transform duration-300 ${isHovered ? "rotate-180 text-primary-600" : ""}`} aria-hidden="true"></i>
+                                        </button>
+
+                                        <AnimatePresence>
+                                            {isHovered && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                                                    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                                                    className="absolute left-1/2 -translate-x-1/2 top-full w-52 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-100 dark:border-slate-800 rounded-2xl shadow-xl py-3 z-[60]"
+                                                    role="menu"
+                                                >
+                                                    {link.submenu.map((subItem) => (
+                                                        <NavLink
+                                                            key={subItem.href}
+                                                            to={subItem.href}
+                                                            end={subItem.href === "/about"}
+                                                            className={({ isActive }) =>
+                                                                `flex items-center space-x-3 px-4 py-2.5 mx-2 rounded-xl text-xs font-bold transition-all ${
+                                                                    isActive
+                                                                        ? "bg-primary-50 dark:bg-primary-950/40 text-primary-600"
+                                                                        : "text-gray-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-primary-600"
+                                                                }`
+                                                            }
+                                                            role="menuitem"
+                                                            onClick={() => setActiveHoveredMenu(null)}
+                                                        >
+                                                            <i className={`${subItem.icon} opacity-60 text-xs`} aria-hidden="true"></i>
+                                                            <span>{subItem.name}</span>
+                                                        </NavLink>
+                                                    ))}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                );
+                            }
+
+                            return (
+                                <NavLink
+                                    key={link.href}
+                                    to={link.href}
+                                    role="menuitem"
+                                    className={({ isActive }) =>
+                                        `text-[0.8rem] font-bold transition-colors flex items-center space-x-2 ${isActive ? "text-primary-600" : "text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400"
+                                        }`
+                                    }
+                                >
+                                    <i className={`${link.icon} text-xs opacity-60`} aria-hidden="true"></i>
+                                    <span>{link.name}</span>
+                                </NavLink>
+                            );
+                        })}
                     </div>
 
                     {/* Right: Action Button / Mobile Toggle */}
@@ -96,7 +199,10 @@ export default function Navbar() {
                         <button
                             className="lg:hidden text-gray-900 dark:text-white p-2 ml-4 focus:outline-none focus:ring-2 focus:ring-primary-600 rounded-lg relative z-[60]"
                             aria-label={isMenuOpen ? "ปิดเมนูนำทาง" : "เปิดเมนูนำทาง"}
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            onClick={() => {
+                                setIsMenuOpen(!isMenuOpen);
+                                if (isMenuOpen) setOpenMobileSubmenu(null);
+                            }}
                         >
                             <i className={`fas ${isMenuOpen ? "fa-times" : "fa-bars"} text-xl`} aria-hidden="true"></i>
                         </button>
@@ -108,21 +214,74 @@ export default function Navbar() {
             <div className={`fixed inset-0 z-[55] bg-white dark:bg-gray-950 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] lg:hidden ${isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none translate-y-[-10px]"}`}>
                 <div className="flex flex-col h-full pt-32 px-10 pb-10">
                     <div className="space-y-6">
-                        {navLinks.map((link, index) => (
-                            <NavLink
-                                key={link.href}
-                                to={link.href}
-                                onClick={() => setIsMenuOpen(false)}
-                                className={({ isActive }) =>
-                                    `text-4xl font-black uppercase transition-all flex items-center space-x-4 ${isActive ? "text-primary-600 translate-x-4" : "text-gray-300 dark:text-gray-700 hover:text-primary-600 dark:hover:text-primary-400"
-                                    }`
-                                }
-                                style={{ transitionDelay: `${index * 50}ms` }}
-                            >
-                                <i className={`${link.icon} text-2xl opacity-40`} aria-hidden="true"></i>
-                                <span>{link.name}</span>
-                            </NavLink>
-                        ))}
+                        {navLinks.map((link, index) => {
+                            if (link.submenu) {
+                                const isMobileOpen = openMobileSubmenu === link.name;
+                                return (
+                                    <div key={link.name} className="flex flex-col space-y-4">
+                                        <button
+                                            onClick={() => setOpenMobileSubmenu(isMobileOpen ? null : link.name)}
+                                            className="text-4xl font-black uppercase transition-all flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-700 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none"
+                                            style={{ transitionDelay: `${index * 50}ms` }}
+                                        >
+                                            <span className="flex items-center space-x-4">
+                                                <i className={`${link.icon} text-2xl opacity-40`} aria-hidden="true"></i>
+                                                <span>{link.name}</span>
+                                            </span>
+                                            <i className={`fas fa-chevron-down text-xl transition-transform duration-300 ${isMobileOpen ? "rotate-180 text-primary-600" : ""}`} aria-hidden="true"></i>
+                                        </button>
+
+                                        <AnimatePresence>
+                                            {isMobileOpen && (
+                                                <motion.div
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: "auto", opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                                                    className="overflow-hidden pl-10 flex flex-col space-y-4 border-l-2 border-slate-100 dark:border-slate-800 ml-3"
+                                                >
+                                                    {link.submenu.map((subItem) => (
+                                                        <NavLink
+                                                            key={subItem.href}
+                                                            to={subItem.href}
+                                                            onClick={() => {
+                                                                setIsMenuOpen(false);
+                                                                setOpenMobileSubmenu(null);
+                                                            }}
+                                                            className={({ isActive }) =>
+                                                                `text-2xl font-black transition-all flex items-center space-x-3 ${
+                                                                    isActive ? "text-primary-600" : "text-gray-400 dark:text-gray-600 hover:text-primary-600"
+                                                                }`
+                                                            }
+                                                            end={subItem.href === "/about"}
+                                                        >
+                                                            <i className={`${subItem.icon} text-lg opacity-60`} aria-hidden="true"></i>
+                                                            <span>{subItem.name}</span>
+                                                        </NavLink>
+                                                    ))}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                );
+                            }
+
+                            return (
+                                <NavLink
+                                    key={link.href}
+                                    to={link.href}
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className={({ isActive }) =>
+                                        `text-4xl font-black uppercase transition-all flex items-center space-x-4 ${isActive ? "text-primary-600 translate-x-4" : "text-gray-300 dark:text-gray-700 hover:text-primary-600 dark:hover:text-primary-400"
+                                        }`
+                                    }
+                                    style={{ transitionDelay: `${index * 50}ms` }}
+                                >
+                                    <i className={`${link.icon} text-2xl opacity-40`} aria-hidden="true"></i>
+                                    <span>{link.name}</span>
+                                </NavLink>
+                            );
+                        })}
                     </div>
 
                     <div className="mt-auto">

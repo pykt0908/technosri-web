@@ -55,6 +55,7 @@ export default function AdminLayout() {
         { title: "บุคลากร", path: "/admin/personnel", icon: "fas fa-users" },
         { title: "สมัครงาน", path: "/admin/jobs", icon: "fas fa-briefcase" },
         { title: "ผู้ใช้งาน", path: "/admin/users", icon: "fas fa-user-shield" },
+        { title: "ดาวน์โหลด", path: "/admin/downloads", icon: "fas fa-download" },
         { title: "ตั้งค่า", path: "/admin/settings", icon: "fas fa-cogs" },
     ];
 

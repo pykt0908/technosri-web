@@ -14,6 +14,8 @@ use App\Http\Controllers\JobPostingController;
 use App\Http\Controllers\SiteSettingController;
 use App\Http\Controllers\CarouselController;
 use App\Http\Controllers\Api\AnalyticsController;
+use App\Http\Controllers\DownloadCategoryController;
+use App\Http\Controllers\DownloadFileController;
 
 // Public Routes
 Route::post('/analytics/log', [AnalyticsController::class, 'log']);
@@ -22,6 +24,12 @@ Route::get('/settings', [SiteSettingController::class, 'index']);
 Route::get('/news', [NewsController::class, 'index']);
 Route::get('/news/v/{slug}', [NewsController::class, 'showBySlug']); 
 Route::get('/carousels/active', [CarouselController::class, 'active']);
+
+// Public Download Routes
+Route::get('/downloads/categories', [DownloadCategoryController::class, 'index']);
+Route::get('/downloads/categories/{category}', [DownloadCategoryController::class, 'show']);
+Route::get('/downloads/categories/v/{slug}', [DownloadCategoryController::class, 'showBySlug']);
+Route::get('/downloads/files/{id}/download', [DownloadFileController::class, 'download']);
 
 // Public Curriculum Routes
 Route::get('/curricula', [CurriculumController::class, 'index']);
@@ -75,4 +83,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/settings', [SiteSettingController::class, 'adminIndex']);
     Route::post('/admin/settings/bulk', [SiteSettingController::class, 'updateBulk']);
     Route::post('/admin/settings/upload', [SiteSettingController::class, 'uploadFile']);
+
+    // Admin Download Routes
+    Route::post('downloads/categories/reorder', [DownloadCategoryController::class, 'reorder']);
+    Route::apiResource('downloads/categories', DownloadCategoryController::class)->except(['index', 'show']);
+    Route::post('downloads/files/reorder', [DownloadFileController::class, 'reorder']);
+    Route::apiResource('downloads/files', DownloadFileController::class)->except(['index', 'show']);
 });

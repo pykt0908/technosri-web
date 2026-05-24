@@ -72,16 +72,7 @@ export default function Navbar() {
         { name: "หลักสูตร", href: "/programs", icon: "fas fa-graduation-cap" },
         { name: "บุคลากร", href: "/personnel", icon: "fas fa-users" },
         { name: "ร่วมงานกับเรา", href: "/join-us", icon: "fas fa-briefcase" },
-        ...(downloadCategories.length > 0 ? [{
-            name: "ดาวน์โหลด",
-            href: `/downloads/${downloadCategories[0].slug}`,
-            icon: "fas fa-cloud-download-alt",
-            submenu: downloadCategories.map(cat => ({
-                name: cat.name,
-                href: `/downloads/${cat.slug}`,
-                icon: "fas fa-file-download"
-            }))
-        }] : []),
+        { name: "ดาวน์โหลด", href: "/downloads", icon: "fas fa-cloud-download-alt" },
         { name: "ติดต่อเรา", href: "/contact", icon: "fas fa-envelope" },
     ];
 

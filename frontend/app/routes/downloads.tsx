@@ -210,37 +210,61 @@ export default function DownloadsPage() {
                                 ))}
                             </div>
                         ) : (
-                            <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-2 pb-3 lg:pb-0 scrollbar-none">
-                                {categories.map((cat) => {
-                                    const isActive = cat.slug === slug;
-                                    return (
-                                        <button
-                                            key={cat.id}
-                                            onClick={() => {
-                                                setSearchTerm("");
-                                                navigate(`/downloads/${cat.slug}`);
-                                            }}
-                                            className={`flex items-center justify-between px-5 py-4 rounded-2xl text-sm font-black whitespace-nowrap lg:whitespace-normal transition-all duration-300 w-full text-left group ${isActive
-                                                    ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-500/20"
-                                                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-primary-600 dark:hover:text-primary-400"
-                                                }`}
-                                        >
-                                            <span>{cat.name}</span>
-                                            <ArrowRight
-                                                size={14}
-                                                className={`hidden lg:block transition-transform duration-300 ${isActive ? "translate-x-1" : "opacity-0 group-hover:opacity-100 group-hover:translate-x-1"
-                                                    }`}
-                                            />
-                                        </button>
-                                    );
-                                })}
-
-                                {categories.length === 0 && (
-                                    <div className="text-center py-6 text-slate-400 font-bold text-xs">
-                                        ไม่พบหมวดหมู่เอกสาร
+                            <>
+                                {/* Mobile Dropdown (Visible only on mobile/tablet) */}
+                                <div className="block lg:hidden w-full relative">
+                                    <select
+                                        value={slug || ""}
+                                        onChange={(e) => {
+                                            setSearchTerm("");
+                                            navigate(`/downloads/${e.target.value}`);
+                                        }}
+                                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 text-sm font-black text-slate-700 dark:text-white appearance-none outline-none focus:ring-2 focus:ring-primary-500 transition-all cursor-pointer shadow-inner pr-12"
+                                    >
+                                        {categories.map((cat) => (
+                                            <option key={cat.id} value={cat.slug} className="font-bold text-slate-800 dark:text-slate-200">
+                                                {cat.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                        <Lucide.ChevronDown size={18} />
                                     </div>
-                                )}
-                            </div>
+                                </div>
+
+                                {/* Desktop Category List (Visible on large screens) */}
+                                <div className="hidden lg:flex lg:flex-col gap-2">
+                                    {categories.map((cat) => {
+                                        const isActive = cat.slug === slug;
+                                        return (
+                                            <button
+                                                key={cat.id}
+                                                onClick={() => {
+                                                    setSearchTerm("");
+                                                    navigate(`/downloads/${cat.slug}`);
+                                                }}
+                                                className={`flex items-center justify-between px-5 py-4 rounded-2xl text-sm font-black transition-all duration-300 w-full text-left group ${isActive
+                                                        ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-500/20"
+                                                        : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-primary-600 dark:hover:text-primary-400"
+                                                    }`}
+                                            >
+                                                <span>{cat.name}</span>
+                                                <ArrowRight
+                                                    size={14}
+                                                    className={`transition-transform duration-300 ${isActive ? "translate-x-1" : "opacity-0 group-hover:opacity-100 group-hover:translate-x-1"
+                                                        }`}
+                                                />
+                                            </button>
+                                        );
+                                    })}
+
+                                    {categories.length === 0 && (
+                                        <div className="text-center py-6 text-slate-400 font-bold text-xs">
+                                            ไม่พบหมวดหมู่เอกสาร
+                                        </div>
+                                    )}
+                                </div>
+                            </>
                         )}
                     </div>
 

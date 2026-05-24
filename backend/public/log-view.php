@@ -93,8 +93,50 @@ if (isset($_GET['action']) && $_GET['action'] === 'clear_log') {
     }
 }
 
+// Action: Fix Schema
+if (isset($_GET['action']) && $_GET['action'] === 'fix_schema') {
+    try {
+        // Boot Laravel
+        $autoloadPath = __DIR__.'/../vendor/autoload.php';
+        $appPath = __DIR__.'/../bootstrap/app.php';
+        
+        // Autodetect on Shared Hosting
+        if (!file_exists($autoloadPath) || !file_exists($appPath)) {
+            $indexContent = @file_get_contents(__DIR__.'/index.php');
+            if ($indexContent) {
+                if (preg_match("/require\s+(['\"])(.*?\/vendor\/autoload\.php)\\1/", $indexContent, $matches)) {
+                    $autoloadPath = str_replace('__DIR__', __DIR__, $matches[2]);
+                }
+                if (preg_match("/(?:require|require_once)\s*\(*\s*(['\"])(.*?\/bootstrap\/app\.php)\\1\s*\)*/i", $indexContent, $matches)) {
+                    $appPath = str_replace('__DIR__', __DIR__, $matches[2]);
+                }
+            }
+        }
+        
+        require $autoloadPath;
+        $app = require_once $appPath;
+        $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+        
+        // 1. Drop download_files table safely
+        Illuminate\Support\Facades\Schema::dropIfExists('download_files');
+        
+        // 2. Remove migration entry from migrations table
+        Illuminate\Support\Facades\DB::table('migrations')
+            ->where('migration', 'like', '%create_download_files_table%')
+            ->delete();
+            
+        // 3. Re-run migrations to create download_files fresh with correct schema
+        $status = Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        
+        echo "<div class='message-success'>ดำเนินการซ่อมแซมระบบตาราง <code>download_files</code> สำเร็จ! ตารางใหม่ถูกสร้างขึ้นใหม่พร้อมคอลัมน์เชื่อมโยง <code>download_document_id</code> เรียบร้อยแล้ว (Artisan code: {$status})</div>";
+    } catch (\Exception $e) {
+        echo "<div style='background-color: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; padding: 15px; border-radius: 8px; margin-bottom: 20px;'>การซ่อมแซมล้มเหลว: " . htmlspecialchars($e->getMessage()) . "</div>";
+    }
+}
+
 echo "<div class='actions'>
         <a href='?action=clear_cache' class='btn'>⚡ ล้างหน่วยความจำแคช (Clear Laravel & OPcache)</a>
+        <a href='?action=fix_schema' class='btn' style='background-color: #d97706;'>🛠️ ซ่อมแซมระบบตาราง (Fix download_files Schema)</a>
         <a href='?action=clear_log' class='btn btn-danger'>🗑️ ล้างไฟล์ล็อกขยะ (Clear laravel.log)</a>
         <a href='/backend/public/db-test.php' class='btn' style='background-color: #64748b;'>📊 ไปที่หน้าทดสอบ DB</a>
       </div>";

@@ -241,14 +241,14 @@ export default function DownloadsPage() {
                             <div className="space-y-6">
                                 {filteredDocuments.map((doc, index) => (
                                     <Reveal key={doc.id} delay={index * 0.05}>
-                                        <div className="group bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 hover:shadow-2xl hover:shadow-primary-500/5 dark:hover:shadow-none transition-all duration-300 space-y-5">
+                                        <div className="group bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 hover:shadow-2xl hover:shadow-primary-500/5 dark:hover:shadow-none transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-6">
                                             
-                                            {/* Top: Icon & Document Title */}
-                                            <div className="flex items-start space-x-4">
-                                                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:scale-105 transition-transform duration-300">
+                                            {/* Left: Icon & Document Title */}
+                                            <div className="flex items-center space-x-4 min-w-0 flex-1">
+                                                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:scale-105 transition-transform duration-300 shrink-0">
                                                     <Lucide.FileText className="text-primary-600 dark:text-primary-400" size={32} />
                                                 </div>
-                                                <div className="space-y-1.5 flex-1 min-w-0">
+                                                <div className="space-y-1.5 min-w-0 flex-1">
                                                     <h3 className="text-lg font-black text-slate-850 dark:text-white leading-snug group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                                                         {doc.title}
                                                     </h3>
@@ -259,56 +259,34 @@ export default function DownloadsPage() {
                                                 </div>
                                             </div>
 
-                                            {/* Bottom: Attachments / Files inside Document */}
-                                            <div className="pt-5 border-t border-slate-50 dark:border-slate-800/80">
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">ดาวน์โหลดรูปแบบเอกสาร:</p>
-                                                <div className="grid grid-cols-1 gap-3.5">
-                                                    {doc.files.map(file => {
-                                                        const ext = file.file_path.split('.').pop()?.toLowerCase();
-                                                        return (
-                                                            <div
-                                                                key={file.id}
-                                                                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-4.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/80 rounded-3xl hover:bg-slate-100/50 dark:hover:bg-slate-800/60 transition-all duration-300 group/file gap-4"
-                                                            >
-                                                                {/* Left: File details */}
-                                                                <div className="flex items-center space-x-3.5 min-w-0 flex-1">
-                                                                    <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl group-hover/file:scale-105 transition-transform duration-300 shrink-0 shadow-sm border border-slate-100/50 dark:border-slate-800/50">
-                                                                        {getFileIcon(file.file_path)}
-                                                                    </div>
-                                                                    <div className="min-w-0 flex-1">
-                                                                        <p className="font-bold text-sm text-slate-800 dark:text-slate-200 truncate group-hover/file:text-primary-600 dark:group-hover/file:text-primary-400 transition-colors">
-                                                                            {file.title}
-                                                                        </p>
-                                                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono mt-0.5 font-bold">
-                                                                            {file.file_size || "N/A"} • ดาวน์โหลด {file.download_count.toLocaleString()} ครั้ง
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
+                                            {/* Right: File download buttons side-by-side */}
+                                            <div className="flex flex-wrap items-center gap-3 shrink-0 w-full md:w-auto">
+                                                {doc.files.map(file => {
+                                                    const ext = file.file_path.split('.').pop()?.toLowerCase();
+                                                    return (
+                                                        <button
+                                                            key={file.id}
+                                                            onClick={() => handleDownload(file.id)}
+                                                            className={`flex-1 md:flex-initial px-5 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center space-x-2 text-white shadow-lg active:scale-95 hover:scale-[1.02] cursor-pointer shrink-0 ${
+                                                                ext === 'pdf'
+                                                                    ? "bg-gradient-to-r from-red-650 to-red-500 hover:from-red-600 hover:to-rose-500 shadow-red-500/10 hover:shadow-red-500/20"
+                                                                    : ['doc', 'docx'].includes(ext || '')
+                                                                    ? "bg-gradient-to-r from-blue-650 to-blue-500 hover:from-blue-600 hover:to-indigo-500 shadow-blue-500/10 hover:shadow-blue-500/20"
+                                                                    : ['xls', 'xlsx'].includes(ext || '')
+                                                                    ? "bg-gradient-to-r from-emerald-650 to-emerald-500 hover:from-emerald-600 hover:to-teal-500 shadow-emerald-500/10 hover:shadow-emerald-500/20"
+                                                                    : "bg-gradient-to-r from-slate-700 to-slate-800 hover:from-primary-600 hover:to-primary-700 shadow-slate-500/10 hover:shadow-primary-500/20"
+                                                            }`}
+                                                            title={`${file.title} • ดาวน์โหลด ${file.download_count} ครั้ง`}
+                                                        >
+                                                            <Download size={12} />
+                                                            <span>{ext?.toUpperCase() || 'ดาวน์โหลด'} {file.file_size ? `(${file.file_size})` : ''}</span>
+                                                        </button>
+                                                    );
+                                                })}
 
-                                                                {/* Right: Download Button */}
-                                                                <button
-                                                                    onClick={() => handleDownload(file.id)}
-                                                                    className={`w-full sm:w-auto px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center space-x-2 text-white shadow-lg active:scale-95 hover:scale-[1.02] cursor-pointer shrink-0 ${
-                                                                        ext === 'pdf'
-                                                                            ? "bg-gradient-to-r from-red-650 to-red-500 hover:from-red-600 hover:to-rose-500 shadow-red-500/10 hover:shadow-red-500/20"
-                                                                            : ['doc', 'docx'].includes(ext || '')
-                                                                            ? "bg-gradient-to-r from-blue-650 to-blue-500 hover:from-blue-600 hover:to-indigo-500 shadow-blue-500/10 hover:shadow-blue-500/20"
-                                                                            : ['xls', 'xlsx'].includes(ext || '')
-                                                                            ? "bg-gradient-to-r from-emerald-650 to-emerald-500 hover:from-emerald-600 hover:to-teal-500 shadow-emerald-500/10 hover:shadow-emerald-500/20"
-                                                                            : "bg-gradient-to-r from-slate-700 to-slate-800 hover:from-primary-600 hover:to-primary-700 shadow-slate-500/10 hover:shadow-primary-500/20"
-                                                                    }`}
-                                                                >
-                                                                    <Download size={12} className="group-hover/file:translate-y-0.5 transition-transform" />
-                                                                    <span>ดาวน์โหลด</span>
-                                                                </button>
-                                                            </div>
-                                                        );
-                                                    })}
-
-                                                    {doc.files.length === 0 && (
-                                                        <span className="text-xs font-bold text-slate-400 italic block py-4">ยังไม่ได้อัปโหลดรูปแบบไฟล์แนบ</span>
-                                                    )}
-                                                </div>
+                                                {doc.files.length === 0 && (
+                                                    <span className="text-xs font-bold text-slate-400 italic py-2">ยังไม่มีไฟล์รูปแบบให้ดาวน์โหลด</span>
+                                                )}
                                             </div>
 
                                         </div>

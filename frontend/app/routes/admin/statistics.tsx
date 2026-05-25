@@ -244,7 +244,7 @@ export default function AdminStatistics() {
 
             {/* Quick Preview Grid (Latest Year Data) */}
             {latestRecord && (
-                <div className="mb-10 p-6 bg-gradient-to-br from-primary-600 to-indigo-600 text-white rounded-3xl shadow-xl shadow-primary-500/10 relative overflow-hidden">
+                <div className="mb-10 p-6 bg-gradient-to-br from-primary-600 to-blue-600 text-white rounded-3xl shadow-xl shadow-primary-500/10 relative overflow-hidden">
                     <div className="absolute right-0 top-0 translate-x-10 -translate-y-10 text-white/[0.03] pointer-events-none">
                         <Sparkles size={300} />
                     </div>
@@ -533,7 +533,7 @@ export default function AdminStatistics() {
 
                                     {/* Division: Staff */}
                                     <div>
-                                        <div className="flex items-center space-x-2 text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em] mb-4 border-b border-slate-100 dark:border-slate-800 pb-2">
+                                        <div className="flex items-center space-x-2 text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mb-4 border-b border-slate-100 dark:border-slate-800 pb-2">
                                             <Users size={14} />
                                             <span>ส่วนที่ 2: สถิติผู้บริหาร ครู และบุคลากร (Staff & Personnel)</span>
                                         </div>

@@ -88,7 +88,7 @@ export default function AboutStatistics() {
         <main className="min-h-screen bg-slate-50 dark:bg-gray-950 pt-32 pb-24 overflow-hidden relative">
             {/* Background dynamic light effect */}
             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary-500/5 rounded-full blur-[120px] -z-10"></div>
-            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[120px] -z-10"></div>
+            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[120px] -z-10"></div>
 
             <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
                 {/* Header Section */}
@@ -100,7 +100,7 @@ export default function AboutStatistics() {
                         </div>
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white leading-[1.15] tracking-tight uppercase">
                             ข้อมูลสถิตินักเรียน <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-indigo-500">และบุคลากรวิทยาลัย</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-blue-500">และบุคลากรวิทยาลัย</span>
                         </h1>
                     </Reveal>
 
@@ -141,7 +141,7 @@ export default function AboutStatistics() {
                             className="space-y-8"
                         >
                             {/* Summary Banner */}
-                            <div className="bg-gradient-to-r from-primary-600 to-indigo-600 text-white rounded-3xl p-6 sm:p-8 shadow-xl shadow-primary-500/10 flex flex-col sm:flex-row items-center sm:justify-between gap-4">
+                            <div className="bg-gradient-to-r from-primary-600 to-blue-600 text-white rounded-3xl p-6 sm:p-8 shadow-xl shadow-primary-500/10 flex flex-col sm:flex-row items-center sm:justify-between gap-4">
                                 <div className="flex items-center space-x-4">
                                     <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-sm shrink-0">
                                         <Calendar size={24} />

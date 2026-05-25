@@ -320,22 +320,22 @@ export default function DownloadsPage() {
                                                         <button
                                                             key={file.id}
                                                             onClick={() => handleDownload(file.id)}
-                                                            className={`flex-1 md:flex-initial px-5 py-3.5 rounded-2xl text-[11px] font-extrabold uppercase tracking-wider transition-all duration-300 flex items-center justify-center space-x-2 text-white shadow-xl active:scale-95 hover:scale-[1.02] cursor-pointer shrink-0 ${
+                                                            className={`flex-1 md:flex-initial px-5 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all duration-300 flex items-center justify-center space-x-2 active:scale-95 hover:scale-[1.02] cursor-pointer shrink-0 border ${
                                                                 ext === 'pdf'
-                                                                    ? "bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 shadow-lg shadow-red-500/25"
+                                                                    ? "bg-red-50 hover:bg-red-100/80 dark:bg-red-950/20 border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400"
                                                                     : ['doc', 'docx'].includes(ext || '')
-                                                                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-500/25"
+                                                                        ? "bg-blue-50 hover:bg-blue-100/80 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/30 text-blue-600 dark:text-blue-400"
                                                                         : ['xls', 'xlsx'].includes(ext || '')
-                                                                            ? "bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 shadow-lg shadow-emerald-500/25"
+                                                                            ? "bg-emerald-50 hover:bg-emerald-100/80 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/30 text-emerald-600 dark:text-emerald-400"
                                                                             : ['ppt', 'pptx'].includes(ext || '')
-                                                                                ? "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-400 hover:to-red-400 shadow-lg shadow-orange-500/25"
+                                                                                ? "bg-orange-50 hover:bg-orange-100/80 dark:bg-orange-950/20 border-orange-100 dark:border-orange-900/30 text-orange-650 dark:text-orange-400"
                                                                                 : ['zip', 'rar', '7z'].includes(ext || '')
-                                                                                    ? "bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 shadow-lg shadow-amber-500/25"
+                                                                                    ? "bg-amber-50 hover:bg-amber-100/80 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/30 text-amber-600 dark:text-amber-450"
                                                                                     : ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')
-                                                                                        ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 shadow-lg shadow-purple-500/25"
+                                                                                        ? "bg-purple-50 hover:bg-purple-100/80 dark:bg-purple-950/20 border-purple-100 dark:border-purple-900/30 text-purple-600 dark:text-purple-400"
                                                                                         : ['mp3', 'wav', 'ogg', 'm4a', 'aac'].includes(ext || '')
-                                                                                            ? "bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 shadow-lg shadow-rose-500/25"
-                                                                                            : "bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-600 shadow-lg shadow-slate-500/20"
+                                                                                            ? "bg-pink-50 hover:bg-pink-100/80 dark:bg-pink-950/20 border-pink-100 dark:border-pink-900/30 text-pink-650 dark:text-pink-400"
+                                                                                            : "bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-450"
                                                             }`}
                                                             title={`${file.title} • ดาวน์โหลด ${file.download_count} ครั้ง`}
                                                         >

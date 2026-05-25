@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Reveal from "../components/Reveal";
 
@@ -254,6 +254,10 @@ const content: Record<string, JSX.Element> = {
 };
 
 export default function AboutPage() {
+    useEffect(() => {
+        document.title = "เกี่ยวกับเรา | วิทยาลัยเทคโนโลยีศรีราชา";
+    }, []);
+
     const scrollToSection = (id: string) => {
         const element = document.getElementById(id);
         if (element) {

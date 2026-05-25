@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Reveal from "../components/Reveal";
 
 interface LogoVariant {
@@ -11,6 +11,10 @@ interface LogoVariant {
 }
 
 export default function CollegeEmblem() {
+    useEffect(() => {
+        document.title = "ตราประจำวิทยาลัย | วิทยาลัยเทคโนโลยีศรีราชา";
+    }, []);
+
     const [downloading, setDownloading] = useState<string | null>(null);
 
     const logoVariants: LogoVariant[] = [

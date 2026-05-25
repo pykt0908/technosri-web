@@ -33,6 +33,7 @@ export default function AboutStatistics() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        document.title = "ข้อมูลสถิตินักเรียนและบุคลากร | วิทยาลัยเทคโนโลยีศรีราชา";
         const fetchStats = async () => {
             try {
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/api/school-statistics`);

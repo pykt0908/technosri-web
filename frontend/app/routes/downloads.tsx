@@ -59,6 +59,7 @@ export default function DownloadsPage() {
 
     // Fetch all categories on mount
     useEffect(() => {
+        document.title = "ดาวน์โหลดเอกสารและแบบฟอร์ม | วิทยาลัยเทคโนโลยีศรีราชา";
         const fetchCategories = async () => {
             try {
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/api/downloads/categories`);

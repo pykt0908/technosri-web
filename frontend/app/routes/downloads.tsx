@@ -320,16 +320,23 @@ export default function DownloadsPage() {
                                                         <button
                                                             key={file.id}
                                                             onClick={() => handleDownload(file.id)}
-                                                            className={`flex-1 md:flex-initial px-5 py-3.5 rounded-2xl text-[11px] font-extrabold uppercase tracking-wider transition-all duration-300 flex items-center justify-center space-x-2 text-white shadow-xl active:scale-95 hover:scale-[1.02] cursor-pointer shrink-0 ${ext === 'pdf'
-                                                                    ? "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-lg shadow-red-500/25"
+                                                            className={`flex-1 md:flex-initial px-5 py-3.5 rounded-2xl text-[11px] font-extrabold uppercase tracking-wider transition-all duration-300 flex items-center justify-center space-x-2 text-white shadow-xl active:scale-95 hover:scale-[1.02] cursor-pointer shrink-0 ${
+                                                                ext === 'pdf'
+                                                                    ? "bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 shadow-lg shadow-red-500/25"
                                                                     : ['doc', 'docx'].includes(ext || '')
                                                                         ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-500/25"
                                                                         : ['xls', 'xlsx'].includes(ext || '')
-                                                                            ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-500/25"
-                                                                            : ['mp3', 'wav', 'ogg', 'm4a', 'aac'].includes(ext || '')
-                                                                                ? "bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 shadow-lg shadow-violet-500/25"
-                                                                                : "bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 shadow-lg shadow-slate-500/20"
-                                                                }`}
+                                                                            ? "bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 shadow-lg shadow-emerald-500/25"
+                                                                            : ['ppt', 'pptx'].includes(ext || '')
+                                                                                ? "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-400 hover:to-red-400 shadow-lg shadow-orange-500/25"
+                                                                                : ['zip', 'rar', '7z'].includes(ext || '')
+                                                                                    ? "bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 shadow-lg shadow-amber-500/25"
+                                                                                    : ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')
+                                                                                        ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 shadow-lg shadow-purple-500/25"
+                                                                                        : ['mp3', 'wav', 'ogg', 'm4a', 'aac'].includes(ext || '')
+                                                                                            ? "bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 shadow-lg shadow-rose-500/25"
+                                                                                            : "bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-600 shadow-lg shadow-slate-500/20"
+                                                            }`}
                                                             title={`${file.title} • ดาวน์โหลด ${file.download_count} ครั้ง`}
                                                         >
                                                             <Download size={12} />

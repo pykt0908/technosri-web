@@ -65,7 +65,7 @@ export default function Navbar() {
             icon: "fas fa-info-circle",
             submenu: [
                 { name: "ข้อมูลวิทยาลัย", href: "/about", icon: "fas fa-university" },
-                { name: "ตราสัญลักษณ์ประจำวิทยาลัย", href: "/about/emblem", icon: "fas fa-shield-alt" },
+                { name: "ตราประจำวิทยาลัย", href: "/about/emblem", icon: "fas fa-shield-alt" },
                 { name: "เพลงประจำวิทยาลัย", href: "/about/songs", icon: "fas fa-music" },
                 { name: "ข้อมูลสถิตินักเรียนและบุคลากร", href: "/about/statistics", icon: "fas fa-chart-bar" }
             ]
@@ -74,6 +74,7 @@ export default function Navbar() {
         { name: "บุคลากร", href: "/personnel", icon: "fas fa-users" },
         { name: "ร่วมงานกับเรา", href: "/join-us", icon: "fas fa-briefcase" },
         { name: "ดาวน์โหลด", href: "/downloads", icon: "fas fa-cloud-download-alt" },
+        { name: "V-Cop", href: "https://backend.v-cop.go.th/LoginStudent", icon: "fas fa-user-graduate" },
         { name: "ติดต่อเรา", href: "/contact", icon: "fas fa-envelope" },
     ];
 
@@ -155,6 +156,23 @@ export default function Navbar() {
                                             )}
                                         </AnimatePresence>
                                     </div>
+                                );
+                            }
+
+                            const isExternal = link.href.startsWith("http");
+                            if (isExternal) {
+                                return (
+                                    <a
+                                        key={link.href}
+                                        href={link.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        role="menuitem"
+                                        className="text-[0.8rem] font-bold transition-colors flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400"
+                                    >
+                                        <i className={`${link.icon} text-xs opacity-60`} aria-hidden="true"></i>
+                                        <span>{link.name}</span>
+                                    </a>
                                 );
                             }
 
@@ -255,6 +273,24 @@ export default function Navbar() {
                                             )}
                                         </AnimatePresence>
                                     </div>
+                                );
+                            }
+
+                            const isExternal = link.href.startsWith("http");
+                            if (isExternal) {
+                                return (
+                                    <a
+                                        key={link.href}
+                                        href={link.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="text-4xl font-black uppercase transition-all flex items-center space-x-4 text-gray-300 dark:text-gray-700 hover:text-primary-600 dark:hover:text-primary-400"
+                                        style={{ transitionDelay: `${index * 50}ms` }}
+                                    >
+                                        <i className={`${link.icon} text-2xl opacity-40`} aria-hidden="true"></i>
+                                        <span>{link.name}</span>
+                                    </a>
                                 );
                             }
 

@@ -1,0 +1,5 @@
+.DS_Store
+**/.DS_Store
+bn-upload/
+backend/Archive.zip
+frontend/lighthouse-report*.json

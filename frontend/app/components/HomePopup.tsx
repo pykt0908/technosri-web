@@ -55,7 +55,7 @@ export default function HomePopup() {
         if (!loading && popups.length > 0 && currentIndex >= 0 && currentIndex < popups.length) {
             const timer = setTimeout(() => {
                 setIsOpen(true);
-            }, 1000);
+            }, 200);
             return () => clearTimeout(timer);
         }
     }, [loading, popups, currentIndex]);

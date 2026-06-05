@@ -27,6 +27,7 @@ export default [
         route("news/create", "routes/admin/news-create.tsx"),
         route("news/edit/:id", "routes/admin/news-edit.tsx"),
         route("carousel", "routes/admin/carousel.tsx"),
+        route("popups", "routes/admin/popups.tsx"),
         route("curricula", "routes/admin/curricula.tsx"),
         route("curricula-create", "routes/admin/curricula-create.tsx"),
         route("curricula-edit/:id", "routes/admin/curricula-edit.tsx"),

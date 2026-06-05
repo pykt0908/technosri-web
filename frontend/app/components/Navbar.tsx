@@ -222,23 +222,44 @@ export default function Navbar() {
 
             {/* Mobile Menu Overlay */}
             <div className={`fixed inset-0 z-[55] bg-white dark:bg-gray-950 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] lg:hidden ${isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none translate-y-[-10px]"}`}>
-                <div className="flex flex-col h-full pt-32 px-10 pb-10">
-                    <div className="space-y-6">
+                {/* Overlay Header with Logo and Close Button */}
+                <div className="flex items-center justify-between h-20 px-6 border-b border-slate-100 dark:border-slate-800 bg-white/95 dark:bg-gray-950/95 backdrop-blur-md">
+                    <div className="flex items-center space-x-3">
+                        <img src="/logo_sriracha.png" alt="โลโก้วิทยาลัยเทคโนโลยีศรีราชา" className="h-8 w-auto" width="32" height="32" />
+                        <div className="flex flex-col leading-none">
+                            <span className="font-black text-xs tracking-tight text-primary-700 whitespace-nowrap uppercase">วิทยาลัยเทคโนโลยีศรีราชา</span>
+                            <span className="text-[0.55rem] font-bold text-gray-500 dark:text-gray-400 tracking-widest uppercase">Sriracha Technological College</span>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => {
+                            setIsMenuOpen(false);
+                            setOpenMobileSubmenu(null);
+                        }}
+                        className="text-gray-900 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-primary-600 rounded-lg"
+                        aria-label="ปิดเมนูนำทาง"
+                    >
+                        <i className="fas fa-times text-xl" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <div className="flex flex-col h-[calc(100%-5rem)] px-6 pb-6 overflow-y-auto">
+                    <div className="space-y-4 pt-6">
                         {navLinks.map((link, index) => {
                             if (link.submenu) {
                                 const isMobileOpen = openMobileSubmenu === link.name;
                                 return (
-                                    <div key={link.name} className="flex flex-col space-y-4">
+                                    <div key={link.name} className="flex flex-col space-y-2">
                                         <button
                                             onClick={() => setOpenMobileSubmenu(isMobileOpen ? null : link.name)}
-                                            className="text-4xl font-black uppercase transition-all flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-700 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none"
+                                            className="text-lg font-bold uppercase transition-all flex items-center justify-between w-full text-left text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none"
                                             style={{ transitionDelay: `${index * 50}ms` }}
                                         >
-                                            <span className="flex items-center space-x-4">
-                                                <i className={`${link.icon} text-2xl opacity-40`} aria-hidden="true"></i>
+                                            <span className="flex items-center space-x-3">
+                                                <i className={`${link.icon} text-lg opacity-60`} aria-hidden="true"></i>
                                                 <span>{link.name}</span>
                                             </span>
-                                            <i className={`fas fa-chevron-down text-xl transition-transform duration-300 ${isMobileOpen ? "rotate-180 text-primary-600" : ""}`} aria-hidden="true"></i>
+                                            <i className={`fas fa-chevron-down text-sm transition-transform duration-300 ${isMobileOpen ? "rotate-180 text-primary-600" : ""}`} aria-hidden="true"></i>
                                         </button>
 
                                         <AnimatePresence>
@@ -247,8 +268,8 @@ export default function Navbar() {
                                                     initial={{ height: 0, opacity: 0 }}
                                                     animate={{ height: "auto", opacity: 1 }}
                                                     exit={{ height: 0, opacity: 0 }}
-                                                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                                                    className="overflow-hidden pl-10 flex flex-col space-y-4 border-l-2 border-slate-100 dark:border-slate-800 ml-3"
+                                                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                                                    className="overflow-hidden pl-6 flex flex-col space-y-2 border-l-2 border-slate-100 dark:border-slate-800 ml-2"
                                                 >
                                                     {link.submenu.map((subItem) => (
                                                         <NavLink
@@ -259,13 +280,13 @@ export default function Navbar() {
                                                                 setOpenMobileSubmenu(null);
                                                             }}
                                                             className={({ isActive }) =>
-                                                                `text-2xl font-black transition-all flex items-center space-x-3 ${
-                                                                    isActive ? "text-primary-600" : "text-gray-400 dark:text-gray-600 hover:text-primary-600"
+                                                                `text-sm font-semibold transition-all flex items-center space-x-2.5 ${
+                                                                    isActive ? "text-primary-600" : "text-gray-500 dark:text-gray-400 hover:text-primary-600"
                                                                 }`
                                                             }
                                                             end={subItem.href === "/about"}
                                                         >
-                                                            <i className={`${subItem.icon} text-lg opacity-60`} aria-hidden="true"></i>
+                                                            <i className={`${subItem.icon} text-xs opacity-60`} aria-hidden="true"></i>
                                                             <span>{subItem.name}</span>
                                                         </NavLink>
                                                     ))}
@@ -285,10 +306,10 @@ export default function Navbar() {
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         onClick={() => setIsMenuOpen(false)}
-                                        className="text-4xl font-black uppercase transition-all flex items-center space-x-4 text-gray-300 dark:text-gray-700 hover:text-primary-600 dark:hover:text-primary-400"
+                                        className="text-lg font-bold uppercase transition-all flex items-center space-x-3 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400"
                                         style={{ transitionDelay: `${index * 50}ms` }}
                                     >
-                                        <i className={`${link.icon} text-2xl opacity-40`} aria-hidden="true"></i>
+                                        <i className={`${link.icon} text-lg opacity-60`} aria-hidden="true"></i>
                                         <span>{link.name}</span>
                                     </a>
                                 );
@@ -300,38 +321,38 @@ export default function Navbar() {
                                     to={link.href}
                                     onClick={() => setIsMenuOpen(false)}
                                     className={({ isActive }) =>
-                                        `text-4xl font-black uppercase transition-all flex items-center space-x-4 ${isActive ? "text-primary-600 translate-x-4" : "text-gray-300 dark:text-gray-700 hover:text-primary-600 dark:hover:text-primary-400"
+                                        `text-lg font-bold uppercase transition-all flex items-center space-x-3 ${isActive ? "text-primary-600 translate-x-2" : "text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400"
                                         }`
                                     }
                                     style={{ transitionDelay: `${index * 50}ms` }}
                                 >
-                                    <i className={`${link.icon} text-2xl opacity-40`} aria-hidden="true"></i>
+                                    <i className={`${link.icon} text-lg opacity-60`} aria-hidden="true"></i>
                                     <span>{link.name}</span>
                                 </NavLink>
                             );
                         })}
                     </div>
 
-                    <div className="mt-auto">
+                    <div className="mt-auto pt-8">
                         <button
                             onClick={() => {
                                 setIsMenuOpen(false);
                                 setIsEnrollModalOpen(true);
                             }}
-                            className="w-full bg-primary-600 text-white py-4 px-8 rounded-2xl text-xl font-black text-center flex items-center justify-between shadow-xl group hover:bg-primary-700 transition-all"
+                            className="w-full bg-primary-600 text-white py-3 px-6 rounded-xl text-base font-bold text-center flex items-center justify-between shadow-xl group hover:bg-primary-700 transition-all"
                         >
-                            <i className="fas fa-clipboard-check text-2xl"></i>
-                            <span className="flex-1 text-center">สมัครเรียน</span>
-                            <i className="fas fa-qrcode text-2xl opacity-80"></i>
+                            <i className="fas fa-clipboard-check text-lg"></i>
+                            <span className="flex-1 text-center font-black">สมัครเรียน</span>
+                            <i className="fas fa-qrcode text-lg opacity-80"></i>
                         </button>
-                        <div className="mt-8 flex justify-center space-x-8 text-gray-400">
-                            <a href="https://www.facebook.com/technosriracha38/" target="_blank" rel="noopener noreferrer" className="text-2xl hover:text-primary-600 transition-colors" aria-label="Facebook วิทยาลัยเทคโนโลยีศรีราชา">
+                        <div className="mt-6 flex justify-center space-x-8 text-gray-400">
+                            <a href="https://www.facebook.com/technosriracha38/" target="_blank" rel="noopener noreferrer" className="text-xl hover:text-primary-600 transition-colors" aria-label="Facebook วิทยาลัยเทคโนโลยีศรีราชา">
                                 <i className="fab fa-facebook-f" aria-hidden="true"></i>
                             </a>
-                            <a href={`https://line.me/ti/p/${settings.line_id || '@technosri'}`} target="_blank" rel="noopener noreferrer" className="text-2xl hover:text-primary-600 transition-colors" aria-label="Line วิทยาลัยเทคโนโลยีศรีราชา">
+                            <a href={`https://line.me/ti/p/${settings.line_id || '@technosri'}`} target="_blank" rel="noopener noreferrer" className="text-xl hover:text-primary-600 transition-colors" aria-label="Line วิทยาลัยเทคโนโลยีศรีราชา">
                                 <i className="fab fa-line" aria-hidden="true"></i>
                             </a>
-                            <a href="https://www.tiktok.com/@technosriracha" target="_blank" rel="noopener noreferrer" className="text-2xl hover:text-primary-600 transition-colors" aria-label="TikTok วิทยาลัยเทคโนโลยีศรีราชา">
+                            <a href="https://www.tiktok.com/@technosriracha" target="_blank" rel="noopener noreferrer" className="text-xl hover:text-primary-600 transition-colors" aria-label="TikTok วิทยาลัยเทคโนโลยีศรีราชา">
                                 <i className="fab fa-tiktok" aria-hidden="true"></i>
                             </a>
                         </div>

@@ -52,7 +52,7 @@ class SiteSettingController extends Controller
     {
         $request->validate([
             'key' => 'required|exists:site_settings,key',
-            'file' => 'required|image|mimes:jpeg,png,jpg,svg|max:2048'
+            'file' => 'required|image|mimes:jpeg,png,jpg,svg,webp|max:2048'
         ]);
 
         $setting = SiteSetting::where('key', $request->key)->first();

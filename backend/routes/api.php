@@ -18,6 +18,7 @@ use App\Http\Controllers\DownloadCategoryController;
 use App\Http\Controllers\DownloadFileController;
 use App\Http\Controllers\DownloadDocumentController;
 use App\Http\Controllers\SchoolStatisticController;
+use App\Http\Controllers\HomePopupController;
 
 // Public Routes
 Route::get('/school-statistics', [SchoolStatisticController::class, 'index']);
@@ -28,6 +29,7 @@ Route::get('/settings', [SiteSettingController::class, 'index']);
 Route::get('/news', [NewsController::class, 'index']);
 Route::get('/news/v/{slug}', [NewsController::class, 'showBySlug']); 
 Route::get('/carousels/active', [CarouselController::class, 'active']);
+Route::get('/popups/active', [HomePopupController::class, 'active']);
 
 // Public Download Routes
 Route::get('/downloads/categories', [DownloadCategoryController::class, 'index']);
@@ -84,6 +86,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin Carousel Management
     Route::post('carousels/reorder', [CarouselController::class, 'reorder']);
     Route::apiResource('carousels', CarouselController::class);
+
+    // Admin Popup Management
+    Route::post('popups/reorder', [HomePopupController::class, 'reorder']);
+    Route::apiResource('popups', HomePopupController::class);
 
     // Admin Site Settings
     Route::get('/admin/settings', [SiteSettingController::class, 'adminIndex']);

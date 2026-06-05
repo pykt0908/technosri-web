@@ -204,15 +204,20 @@ export default function AdminDashboard() {
                         </div>
                     </div>
                     <div className="space-y-3">
-                        {data.devices.labels.map((label, idx) => (
-                            <div key={label} className="flex items-center justify-between">
-                                <div className="flex items-center">
-                                    <div className={`w-2 h-2 rounded-full mr-3 ${idx === 0 ? 'bg-primary-500' : idx === 1 ? 'bg-indigo-500' : 'bg-rose-500'}`}></div>
-                                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">{label}</span>
+                        {data.devices.labels.map((label, idx) => {
+                            const totalDevices = data.devices.series.reduce((sum, val) => sum + val, 0) || 1;
+                            const percentage = ((data.devices.series[idx] / totalDevices) * 100).toFixed(1);
+
+                            return (
+                                <div key={label} className="flex items-center justify-between">
+                                    <div className="flex items-center">
+                                        <div className={`w-2 h-2 rounded-full mr-3 ${idx === 0 ? 'bg-primary-500' : idx === 1 ? 'bg-indigo-500' : 'bg-rose-500'}`}></div>
+                                        <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">{label}</span>
+                                    </div>
+                                    <span className="text-xs font-black text-slate-900 dark:text-white">{percentage}%</span>
                                 </div>
-                                <span className="text-xs font-black text-slate-900 dark:text-white">{data.devices.series[idx]}%</span>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </div>

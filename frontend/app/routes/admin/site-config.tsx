@@ -21,7 +21,6 @@ export default function AdminSettings() {
         { id: "enrollment", label: "การรับสมัคร", icon: "fas fa-graduation-cap" },
         { id: "recruitment", label: "รับสมัครงาน", icon: "fas fa-briefcase" },
         { id: "contact", label: "ข้อมูลติดต่อ", icon: "fas fa-phone" },
-        { id: "popup", label: "ป๊อปอัปหน้าแรก", icon: "fas fa-window-restore" },
     ];
 
     useEffect(() => {
@@ -32,7 +31,10 @@ export default function AdminSettings() {
         try {
             const token = localStorage.getItem("admin_token");
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/settings`, {
-                headers: { "Authorization": `Bearer ${token}` }
+                headers: { 
+                    "Authorization": `Bearer ${token}`,
+                    "Accept": "application/json"
+                }
             });
             const data = await res.json();
             setSettings(data);
@@ -55,6 +57,7 @@ export default function AdminSettings() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Accept": "application/json",
                     "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify({ settings: settings.map(s => ({ key: s.key, value: s.value })) })
@@ -82,7 +85,10 @@ export default function AdminSettings() {
             const token = localStorage.getItem("admin_token");
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/settings/upload`, {
                 method: "POST",
-                headers: { "Authorization": `Bearer ${token}` },
+                headers: { 
+                    "Authorization": `Bearer ${token}`,
+                    "Accept": "application/json"
+                },
                 body: formData
             });
             const data = await res.json();
@@ -91,7 +97,8 @@ export default function AdminSettings() {
                 handleValueChange(key, data.path);
                 toast.success("อัปโหลดสำเร็จ", { id: loadingToast });
             } else {
-                throw new Error();
+                const errorMsg = data.errors ? Object.values(data.errors).flat().join(", ") : (data.message || "อัปโหลดไม่สำเร็จ");
+                toast.error(errorMsg, { id: loadingToast });
             }
         } catch (err) {
             toast.error("อัปโหลดไม่สำเร็จ", { id: loadingToast });

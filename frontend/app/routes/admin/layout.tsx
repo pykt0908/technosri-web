@@ -51,6 +51,7 @@ export default function AdminLayout() {
         { title: "แดชบอร์ด", path: "/admin", icon: "fas fa-tachometer-alt" },
         { title: "ข่าวสาร", path: "/admin/news", icon: "fas fa-newspaper" },
         { title: "ภาพสไลด์", path: "/admin/carousel", icon: "fas fa-images" },
+        { title: "ป๊อปอัปหน้าแรก", path: "/admin/popups", icon: "fas fa-window-restore" },
         { title: "หลักสูตร", path: "/admin/curricula", icon: "fas fa-book-open" },
         { title: "บุคลากร", path: "/admin/personnel", icon: "fas fa-users" },
         { title: "สมัครงาน", path: "/admin/jobs", icon: "fas fa-briefcase" },

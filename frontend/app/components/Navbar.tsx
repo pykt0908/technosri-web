@@ -102,7 +102,7 @@ export default function Navbar() {
                     </div>
 
                     {/* Center: Navigation Links (Desktop) */}
-                    <div className="hidden lg:flex flex-[3] justify-center items-center space-x-6" role="menubar">
+                    <div className="hidden xl:flex flex-[3] justify-center items-center space-x-4 xl:space-x-6" role="menubar">
                         {navLinks.map((link) => {
                             if (link.submenu) {
                                 const isHovered = activeHoveredMenu === link.name;
@@ -207,7 +207,7 @@ export default function Navbar() {
                         </button>
                         {/* Mobile Menu Btn */}
                         <button
-                            className="lg:hidden text-gray-900 dark:text-white p-2 ml-4 focus:outline-none focus:ring-2 focus:ring-primary-600 rounded-lg relative z-[60]"
+                            className="xl:hidden text-gray-900 dark:text-white p-2 ml-4 focus:outline-none focus:ring-2 focus:ring-primary-600 rounded-lg relative z-[60]"
                             aria-label={isMenuOpen ? "ปิดเมนูนำทาง" : "เปิดเมนูนำทาง"}
                             onClick={() => {
                                 setIsMenuOpen(!isMenuOpen);
@@ -221,7 +221,7 @@ export default function Navbar() {
             </nav>
 
             {/* Mobile Menu Overlay */}
-            <div className={`fixed inset-0 z-[55] bg-white dark:bg-gray-950 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] lg:hidden ${isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none translate-y-[-10px]"}`}>
+            <div className={`fixed inset-0 z-[55] bg-white dark:bg-gray-950 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] xl:hidden ${isMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none translate-y-[-10px]"}`}>
                 {/* Overlay Header with Logo and Close Button */}
                 <div className="flex items-center justify-between h-20 px-6 border-b border-slate-100 dark:border-slate-800 bg-white/95 dark:bg-gray-950/95 backdrop-blur-md">
                     <div className="flex items-center space-x-3">

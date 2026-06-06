@@ -186,7 +186,7 @@ export default function Success() {
                     </div>
 
                     {/* Middle Column (Animation Sequence) */}
-                    <div className="lg:col-span-6 relative h-[450px] md:h-[650px] flex items-end justify-center order-2">
+                    <div className="lg:col-span-6 relative h-[450px] md:h-[650px] flex items-end justify-center order-2 w-full max-w-[500px] md:max-w-[600px] lg:max-w-none mx-auto">
                         <motion.div 
                             initial={{ opacity: 0, scale: 0.98, y: 30 }}
                             whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -276,7 +276,7 @@ export default function Success() {
                                 y: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 },
                                 duration: 1.2, delay: 1.2
                             }}
-                            className="absolute top-1/2 -right-4 md:-right-12 z-50 p-[2px] bg-gradient-to-br from-indigo-400 via-blue-400 to-cyan-400 rounded-[2rem] scale-90 md:scale-100 shadow-xl shadow-blue-500/5 will-change-transform"
+                            className="absolute top-1/2 right-2 md:-right-6 lg:-right-12 z-50 p-[2px] bg-gradient-to-br from-indigo-400 via-blue-400 to-cyan-400 rounded-[2rem] scale-90 md:scale-100 shadow-xl shadow-blue-500/5 will-change-transform"
                         >
                             <div className="bg-white dark:bg-gray-950 px-6 py-4 rounded-[1.9rem] flex items-center space-x-3">
                                 <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center text-blue-600">
@@ -300,7 +300,7 @@ export default function Success() {
                                 y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 },
                                 duration: 1.2, delay: 1.4
                             }}
-                            className="absolute bottom-4 -left-4 md:-left-12 z-50 p-[2px] bg-gradient-to-br from-green-400 via-emerald-400 to-teal-400 rounded-[2rem] scale-90 md:scale-100 shadow-xl shadow-green-500/5 will-change-transform"
+                            className="absolute bottom-4 left-2 md:-left-6 lg:-left-12 z-50 p-[2px] bg-gradient-to-br from-green-400 via-emerald-400 to-teal-400 rounded-[2rem] scale-90 md:scale-100 shadow-xl shadow-green-500/5 will-change-transform"
                         >
                             <div className="bg-white dark:bg-gray-950 px-6 py-4 rounded-[1.9rem] flex items-center space-x-3">
                                 <div className="w-10 h-10 bg-green-50 dark:bg-green-900/20 rounded-xl flex items-center justify-center text-green-600">

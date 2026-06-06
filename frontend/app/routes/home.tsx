@@ -16,7 +16,7 @@ export default function Home() {
       <BentoMenu />
       <HomePopup />
       <Suspense fallback={<div className="h-96 animate-pulse bg-gray-50 dark:bg-gray-900 rounded-3xl m-10"></div>}>
-        {/* <Success /> */}
+        <Success />
       </Suspense>
       <Suspense fallback={<div className="h-96 animate-pulse bg-gray-50 dark:bg-gray-900 rounded-3xl m-10"></div>}>
         <Programs />

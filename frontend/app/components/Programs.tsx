@@ -100,10 +100,10 @@ export default function Programs({ initialData = [] }: { initialData?: Curriculu
                         </h2>
                     </Reveal>
                     <Reveal delay={0.2} className="flex flex-col items-end space-y-8">
-                        <p className="text-gray-500 dark:text-gray-400 max-w-sm font-medium text-right hidden md:block leading-relaxed text-sm">
+                        <p className="text-gray-500 dark:text-gray-400 max-w-sm font-medium text-right hidden lg:block leading-relaxed text-sm">
                             วิทยาลัยเทคโนโลยีศรีราชาเปิดสอนหลักสูตรประกาศนียบัตรวิชาชีพ และประกาศนียบัตรวิชาชีพชั้นสูงหลากหลายหลักสูตร ดังนี้
                         </p>
-                        <div className="flex items-center space-x-4">
+                        <div className="hidden lg:flex items-center space-x-4">
                             <button
                                 onClick={prevSlide}
                                 className={`w-12 h-12 rounded-xl flex items-center justify-center border transition-all ${currentIndex === 0 ? 'border-gray-100 text-gray-300' : 'border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white hover:bg-primary-600 hover:text-white hover:border-primary-600 shadow-sm'}`}
@@ -132,7 +132,7 @@ export default function Programs({ initialData = [] }: { initialData?: Curriculu
                             ))}
                         </div>
                     ) : (
-                        <div className="overflow-x-auto md:overflow-visible pb-6 md:pb-0 program-scroll snap-x snap-mandatory md:snap-none">
+                        <div className="overflow-x-auto lg:overflow-visible pb-6 lg:pb-0 program-scroll snap-x snap-mandatory lg:snap-none">
                             <div
                                 className="flex transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] mobile-scroll-slider"
                                 style={{
@@ -214,18 +214,18 @@ export default function Programs({ initialData = [] }: { initialData?: Curriculu
                 .dark .program-scroll::-webkit-scrollbar-thumb {
                     background: #334155;
                 }
-                @media (max-width: 767px) {
+                @media (max-width: 1023px) {
                     .mobile-scroll-slider {
                         transform: none !important;
                         padding-left: 12px !important;
                         padding-right: 12px !important;
                     }
                     .mobile-scroll-item {
-                        width: 290px !important;
+                        width: 310px !important;
                         flex-shrink: 0 !important;
                     }
                 }
-                @media (min-width: 768px) {
+                @media (min-width: 1024px) {
                     .program-scroll::-webkit-scrollbar {
                         display: none;
                     }

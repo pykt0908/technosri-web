@@ -90,8 +90,8 @@ export default function TrustSection() {
                 </Reveal>
             </div>
 
-            {/* Marquee Flows */}
-            <div className="relative w-full flex flex-col gap-6 select-none overflow-hidden py-4">
+            {/* Desktop Marquee Flows */}
+            <div className="hidden lg:flex relative w-full flex flex-col gap-6 select-none overflow-hidden py-4">
                 {/* Row 1: Left scrolling */}
                 <div className="marquee-wrapper">
                     <div className="animate-marquee-left hover:pause">
@@ -116,6 +116,24 @@ export default function TrustSection() {
                             </a>
                         ))}
                     </div>
+                </div>
+            </div>
+
+            {/* Mobile & Tablet Static Grid (Shows all logos at once) */}
+            <div className="lg:hidden relative z-10 px-6 max-w-[1440px] mx-auto select-none">
+                <div className="grid grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6 justify-center justify-items-center">
+                    {organizations.map((org, index) => (
+                        <a 
+                            href={org.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            key={`grid-${index}`} 
+                            className="grid-org-card"
+                            title={org.name}
+                        >
+                            <img src={org.logo} alt={org.name} className="logo-image" loading="lazy" />
+                        </a>
+                    ))}
                 </div>
             </div>
 
@@ -204,6 +222,41 @@ export default function TrustSection() {
                     max-width: 100%;
                     max-height: 100%;
                     object-fit: contain;
+                }
+
+                .grid-org-card {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 5.5rem;
+                    height: 5.5rem;
+                    border-radius: 1rem;
+                    background: #ffffff;
+                    padding: 0.55rem;
+                    border: 1px solid rgba(148, 163, 184, 0.12);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+                    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+
+                .dark .grid-org-card {
+                    background: #ffffff;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                }
+
+                .grid-org-card:hover {
+                    transform: translateY(-4px);
+                    border-color: rgba(30, 162, 255, 0.35);
+                    box-shadow: 0 10px 20px -5px rgba(30, 162, 255, 0.15);
+                }
+
+                @media (min-width: 640px) {
+                    .grid-org-card {
+                        width: 7.5rem;
+                        height: 7.5rem;
+                        border-radius: 1.5rem;
+                        padding: 0.75rem;
+                    }
                 }
             `}</style>
         </section>

@@ -91,7 +91,7 @@ export default function TrustSection() {
             </div>
 
             {/* Desktop Marquee Flows */}
-            <div className="hidden lg:flex relative w-full flex flex-col gap-6 select-none overflow-hidden py-4">
+            <div className="hidden xl:flex relative w-full flex flex-col gap-6 select-none overflow-hidden py-4">
                 {/* Row 1: Left scrolling */}
                 <div className="marquee-wrapper">
                     <div className="animate-marquee-left hover:pause">
@@ -120,7 +120,7 @@ export default function TrustSection() {
             </div>
 
             {/* Mobile & Tablet Static Grid (Shows all logos at once) */}
-            <div className="lg:hidden relative z-10 px-6 max-w-[1440px] mx-auto select-none">
+            <div className="xl:hidden relative z-10 px-6 max-w-[1440px] mx-auto select-none">
                 <div className="grid grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6 justify-center justify-items-center">
                     {organizations.map((org, index) => (
                         <a 

@@ -5,7 +5,7 @@ import Reveal from "../components/Reveal";
 export default function Sitemap() {
     const siteMapData = [
         {
-            group: "Main Navigation",
+            group: "Main Navigation (เมนูนำทางหลัก)",
             links: [
                 { name: "หน้าแรก (Home)", path: "/" },
                 { name: "เกี่ยวกับวิทยาลัย (About)", path: "/about" },
@@ -15,14 +15,24 @@ export default function Sitemap() {
             ]
         },
         {
-            group: "Academic & Programs",
+            group: "Academic & Information (ข้อมูลสถาบันและหลักสูตร)",
             links: [
                 { name: "หลักสูตรที่เปิดสอน (Curricula)", path: "/programs" },
                 { name: "ข้อมูลบุคลากร (Personnel)", path: "/personnel" },
+                { name: "ตราประจำวิทยาลัย (College Emblem)", path: "/about/emblem" },
+                { name: "เพลงประจำวิทยาลัย (College Songs)", path: "/about/songs" },
+                { name: "ข้อมูลสถิตินักเรียนและบุคลากร (Statistics)", path: "/about/statistics" },
             ]
         },
         {
-            group: "Legal & Information",
+            group: "Resources & Services (บริการและเอกสาร)",
+            links: [
+                { name: "ดาวน์โหลดเอกสาร (Downloads)", path: "/downloads" },
+                { name: "ระบบ V-Cop Student (V-Cop Portal)", path: "https://backend.v-cop.go.th/LoginStudent" },
+            ]
+        },
+        {
+            group: "Legal & Info (นโยบายและข้อตกลง)",
             links: [
                 { name: "นโยบายความเป็นส่วนตัว (Privacy Policy)", path: "/privacy-policy" },
                 { name: "เงื่อนไขการใช้งาน (Terms of Service)", path: "/terms-of-service" },
@@ -47,18 +57,25 @@ export default function Sitemap() {
                                 {section.group}
                             </h2>
                             <div className="grid grid-cols-1 gap-1 pl-12">
-                                {section.links.map((link, lIdx) => (
-                                    <Link 
-                                        key={lIdx} 
-                                        to={link.path}
-                                        className="group py-3 flex items-center justify-between border-b border-slate-50 dark:border-slate-900 hover:border-primary-500/20 transition-all"
-                                    >
-                                        <span className="text-slate-600 dark:text-slate-400 group-hover:text-primary-600 font-medium transition-colors">
-                                            {link.name}
-                                        </span>
-                                        <ChevronRight size={14} className="text-slate-300 dark:text-slate-700 group-hover:text-primary-500 group-hover:translate-x-1 transition-all" />
-                                    </Link>
-                                ))}
+                                {section.links.map((link, lIdx) => {
+                                    const isExternal = link.path.startsWith("http");
+                                    const LinkComponent = isExternal ? "a" : Link;
+                                    const linkProps = isExternal 
+                                        ? { href: link.path, target: "_blank", rel: "noopener noreferrer" } 
+                                        : { to: link.path };
+                                    return (
+                                        <LinkComponent 
+                                            key={lIdx} 
+                                            {...(linkProps as any)}
+                                            className="group py-3 flex items-center justify-between border-b border-slate-50 dark:border-slate-900 hover:border-primary-500/20 transition-all"
+                                        >
+                                            <span className="text-slate-600 dark:text-slate-400 group-hover:text-primary-600 font-medium transition-colors">
+                                                {link.name}
+                                            </span>
+                                            <ChevronRight size={14} className="text-slate-300 dark:text-slate-700 group-hover:text-primary-500 group-hover:translate-x-1 transition-all" />
+                                        </LinkComponent>
+                                    );
+                                })}
                             </div>
                         </div>
                     ))}

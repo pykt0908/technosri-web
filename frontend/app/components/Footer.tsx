@@ -11,7 +11,7 @@ export default function Footer() {
             <div className="max-w-7xl mx-auto px-6 lg:px-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 mb-20">
                     {/* Brand Section */}
-                    <div className="lg:col-span-5">
+                    <div className="lg:col-span-4">
                         <div className="flex items-center space-x-5 mb-8">
                             <div className="bg-white p-2.5 rounded-xl shadow-xl shadow-white/5">
                                 <img src="/logo_sriracha.png" alt="Sriracha Technological College Logo" className="h-12 w-auto" width="48" height="48" />
@@ -38,7 +38,7 @@ export default function Footer() {
                     </div>
 
                     {/* Navigation Links */}
-                    <div className="lg:col-span-3">
+                    <div className="lg:col-span-2">
                         <h3 className="text-white font-bold mb-8 uppercase tracking-widest text-sm border-b border-slate-800 pb-4 inline-block">เมนูนำทาง</h3>
                         <ul className="space-y-4 text-sm font-medium">
                             <li>
@@ -64,8 +64,65 @@ export default function Footer() {
                         </ul>
                     </div>
 
+                    {/* Related Websites Section */}
+                    <div className="lg:col-span-3">
+                        <h3 className="text-white font-bold mb-8 uppercase tracking-widest text-sm border-b border-slate-800 pb-4 inline-block">เว็บไซต์ที่เกี่ยวข้อง</h3>
+                        <ul className="space-y-3 text-xs font-semibold">
+                            <li>
+                                <a href="https://www.moe.go.th" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary-500 transition-colors flex items-center group">
+                                    <ChevronRight size={12} className="mr-1.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" /> กระทรวงศึกษาธิการ
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.ovec.go.th" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary-500 transition-colors flex items-center group">
+                                    <ChevronRight size={12} className="mr-1.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" /> สำนักงานคณะกรรมการการอาชีวศึกษา
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://opec.go.th" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary-500 transition-colors flex items-center group">
+                                    <ChevronRight size={12} className="mr-1.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" /> สำนักงานคณะกรรมการส่งเสริมการศึกษาเอกชน
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.studentloan.or.th" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary-500 transition-colors flex items-center group">
+                                    <ChevronRight size={12} className="mr-1.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" /> กองทุนเงินให้กู้ยืมเพื่อการศึกษา (กยศ.)
+                                </a>
+                            </li>
+                            <li>
+                                <a href="http://www.pvet.or.th/" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary-500 transition-colors flex items-center group">
+                                    <ChevronRight size={12} className="mr-1.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" /> สมาคมวิทยาลัยเทคโนโลยีฯ เอกชน
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.thaihealth.or.th" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary-500 transition-colors flex items-center group">
+                                    <ChevronRight size={12} className="mr-1.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" /> สำนักงานกองทุนสนับสนุนการสร้างเสริมสุขภาพ
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.facebook.com/mstcmc14?locale=th_TH" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary-500 transition-colors flex items-center group">
+                                    <ChevronRight size={12} className="mr-1.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" /> ศูนย์ฝึกนักศึกษาวิชาทหาร มทบ.14
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.onesqa.or.th" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary-500 transition-colors flex items-center group">
+                                    <ChevronRight size={12} className="mr-1.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" /> สมศ. (ONESQA)
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.mol.go.th" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary-500 transition-colors flex items-center group">
+                                    <ChevronRight size={12} className="mr-1.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" /> กระทรวงแรงงาน
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.tpqi.go.th" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-primary-500 transition-colors flex items-center group">
+                                    <ChevronRight size={12} className="mr-1.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" /> สถาบันคุณวุฒิวิชาชีพ (สคช.)
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
                     {/* Contact Information Section */}
-                    <div className="lg:col-span-4">
+                    <div className="lg:col-span-3">
                         <h3 className="text-white font-bold mb-8 uppercase tracking-widest text-sm border-b border-slate-800 pb-4 inline-block">ข้อมูลการติดต่อ</h3>
                         <ul className="space-y-6">
                             <li className="flex items-start space-x-4 group">

@@ -1,6 +1,6 @@
 import { Suspense, lazy } from "react";
 import Hero from "../components/Hero";
-import BentoMenu from "../components/BentoMenu";
+import TrustSection from "../components/TrustSection";
 import HomePopup from "../components/HomePopup";
 
 // Lazy load non-critical sections
@@ -13,20 +13,26 @@ export default function Home() {
   return (
     <main id="main-content">
       <Hero />
-      <BentoMenu />
-      <HomePopup />
-      <Suspense fallback={<div className="h-96 animate-pulse bg-gray-50 dark:bg-gray-900 rounded-3xl m-10"></div>}>
-        <Success />
-      </Suspense>
-      <Suspense fallback={<div className="h-96 animate-pulse bg-gray-50 dark:bg-gray-900 rounded-3xl m-10"></div>}>
-        <Programs />
-      </Suspense>
-      <Suspense fallback={<div className="h-96 animate-pulse bg-gray-50 dark:bg-gray-900 rounded-3xl m-10"></div>}>
-        <About />
-      </Suspense>
+      
       <Suspense fallback={<div className="h-96 animate-pulse bg-gray-50 dark:bg-gray-900 rounded-3xl m-10"></div>}>
         <News />
       </Suspense>
+
+      <Suspense fallback={<div className="h-96 animate-pulse bg-gray-50 dark:bg-gray-900 rounded-3xl m-10"></div>}>
+        <Programs />
+      </Suspense>
+
+      <Suspense fallback={<div className="h-96 animate-pulse bg-gray-50 dark:bg-gray-900 rounded-3xl m-10"></div>}>
+        <About />
+      </Suspense>
+
+      <Suspense fallback={<div className="h-96 animate-pulse bg-gray-50 dark:bg-gray-900 rounded-3xl m-10"></div>}>
+        {/* <Success /> */}
+      </Suspense>
+
+      <TrustSection />
+
+      <HomePopup />
     </main>
   );
 }

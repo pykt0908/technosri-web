@@ -1,7 +1,12 @@
 {
   "name": "frontend",
+  "version": "1.0.0",
   "private": true,
+  "description": "A modern, production-ready template for building full-stack React applications using React Router.",
+  "license": "ISC",
+  "author": "",
   "type": "module",
+  "main": "index.js",
   "scripts": {
     "build": "react-router build",
     "dev": "react-router dev",

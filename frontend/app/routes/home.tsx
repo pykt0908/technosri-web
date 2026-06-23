@@ -7,6 +7,7 @@ import HomePopup from "../components/HomePopup";
 const Programs = lazy(() => import("../components/Programs"));
 const About = lazy(() => import("../components/About"));
 const News = lazy(() => import("../components/News"));
+const CalendarSection = lazy(() => import("../components/CalendarSection"));
 const Success = lazy(() => import("../components/Success"));
 
 export default function Home() {
@@ -16,6 +17,10 @@ export default function Home() {
       
       <Suspense fallback={<div className="h-96 animate-pulse bg-gray-50 dark:bg-gray-900 rounded-3xl m-10"></div>}>
         <News />
+      </Suspense>
+
+      <Suspense fallback={<div className="h-96 animate-pulse bg-gray-50 dark:bg-gray-900 rounded-3xl m-10"></div>}>
+        <CalendarSection />
       </Suspense>
 
       <Suspense fallback={<div className="h-96 animate-pulse bg-gray-50 dark:bg-gray-900 rounded-3xl m-10"></div>}>

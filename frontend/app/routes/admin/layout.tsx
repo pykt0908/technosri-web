@@ -58,6 +58,7 @@ export default function AdminLayout() {
         { title: "สมัครงาน", path: "/admin/jobs", icon: "fas fa-briefcase" },
         { title: "ผู้ใช้งาน", path: "/admin/users", icon: "fas fa-user-shield" },
         { title: "ดาวน์โหลด", path: "/admin/downloads", icon: "fas fa-download" },
+        { title: "รายงาน SAR", path: "/admin/sar", icon: "fas fa-file-contract" },
         { title: "สถิติวิทยาลัย", path: "/admin/statistics", icon: "fas fa-chart-bar" },
         { title: "ตั้งค่า", path: "/admin/settings", icon: "fas fa-cogs" },
     ];

@@ -111,6 +111,69 @@ export default function Staff() {
         }
     };
 
+    const renderStaffCard = (staff: Personnel, idx: number) => {
+        // Generate a scattered rotation angle for Polaroid styling
+        const tilts = [-1.5, 1.2, -0.8, 1.5, -1.2, 0.8];
+        const rotation = tilts[idx % tilts.length];
+
+        return (
+            <motion.div
+                key={staff.id}
+                variants={cardVariants}
+                whileHover={{
+                    scale: 1.04,
+                    rotate: 0,
+                    y: -8,
+                    zIndex: 10,
+                    transition: { duration: 0.25, ease: "easeOut" }
+                }}
+                style={{ rotate: rotation }}
+                className="group h-full origin-center"
+            >
+                <div className="bg-[#fcfcf9] dark:bg-slate-900 p-3 pb-6 sm:p-4 sm:pb-8 border border-slate-200/80 dark:border-slate-800 shadow-md hover:shadow-2xl transition-shadow duration-300 flex flex-col h-full relative rounded-sm">
+                    {/* Sticky Tape Decoration */}
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5 bg-white/35 dark:bg-slate-800/35 border-x border-slate-300/20 dark:border-slate-700/20 backdrop-blur-[1px] rotate-[-1deg] shadow-[0_1px_2px_rgba(0,0,0,0.03)] z-20 pointer-events-none"></div>
+
+                    {/* Photo Area */}
+                    <div className="aspect-[4/5] relative bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-800/60 overflow-hidden shadow-inner">
+                        {staff.image ? (
+                            <img
+                                src={`${import.meta.env.VITE_API_URL}/storage/${staff.image}`}
+                                alt={staff.name}
+                                className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-700">
+                                <Users size={32} strokeWidth={1.5} />
+                                <span className="text-[9px] font-bold mt-2 uppercase tracking-widest opacity-65">No Image</span>
+                            </div>
+                        )}
+                        {/* Photo Sheen / Matte Reflection Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 dark:via-white/2 dark:to-white/5 pointer-events-none"></div>
+                        <div className="absolute inset-0 bg-black/5 dark:bg-black/10 mix-blend-overlay pointer-events-none"></div>
+                    </div>
+
+                    {/* Text Content (Polaroid Caption style) */}
+                    <div className="pt-4 pb-1 px-1 flex flex-col flex-1 items-center text-center">
+                        <h3 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white mb-0.5 tracking-tight line-clamp-1">
+                            {staff.name}
+                        </h3>
+                        <p className="text-[12px] font-medium text-slate-400 mb-3">
+                            {staff.nickname ? `(${staff.nickname})` : " "}
+                        </p>
+
+                        {/* Position Badge - Styled like a tape label marker */}
+                        <div className="mt-auto w-full px-2 py-1.5 bg-slate-800 dark:bg-slate-950 text-slate-100 rounded-sm border-t border-b border-slate-700/50 shadow-[0_1px_2px_rgba(0,0,0,0.15)] flex items-center justify-center">
+                            <span className="text-[10px] sm:text-[11px] font-bold tracking-wider block leading-tight text-center uppercase">
+                                {staff.position || "บุคลากร"}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+        );
+    };
+
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
             <div className="w-12 h-12 border-4 border-primary-100 border-t-primary-600 rounded-full animate-spin"></div>
@@ -179,8 +242,52 @@ export default function Staff() {
                     {/* Personnel List (Right Column on Desktop, Full Width on Mobile) */}
                     <div className="col-span-1 md:col-span-8 lg:col-span-9 space-y-16">
                         <div className="space-y-16">
-                            {departments.map((dept) => (
-                                dept.personnel.length > 0 && (
+                            {departments.filter(d => d.personnel.length > 0).map((dept, deptIdx) => {
+                                const isCategory2 = deptIdx === 1;
+
+                                if (isCategory2) {
+                                    const director = dept.personnel[0];
+                                    const restOfStaff = dept.personnel.slice(1);
+
+                                    return (
+                                        <section key={dept.id} id={`dept-${dept.id}`} className="scroll-mt-36">
+                                            <div className="flex items-center mb-8">
+                                                <div className="w-1.5 h-8 bg-primary-600 rounded-full mr-4 shadow-md shadow-primary-600/20"></div>
+                                                <h2 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white tracking-tight">
+                                                    {dept.name}
+                                                </h2>
+                                            </div>
+
+                                            {/* Director Row (Left-aligned & Same column size) */}
+                                            {director && (
+                                                <motion.div 
+                                                    variants={containerVariants}
+                                                    initial="hidden"
+                                                    whileInView="visible"
+                                                    viewport={{ once: false, amount: 0.05, margin: "-40px 0px" }}
+                                                    className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8 mb-10"
+                                                >
+                                                    {renderStaffCard(director, 0)}
+                                                </motion.div>
+                                            )}
+
+                                            {/* Rest of Staff Grid */}
+                                            {restOfStaff.length > 0 && (
+                                                <motion.div 
+                                                    variants={containerVariants}
+                                                    initial="hidden"
+                                                    whileInView="visible"
+                                                    viewport={{ once: false, amount: 0.05, margin: "-40px 0px" }}
+                                                    className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"
+                                                >
+                                                    {restOfStaff.map((staff, idx) => renderStaffCard(staff, idx + 1))}
+                                                </motion.div>
+                                            )}
+                                        </section>
+                                    );
+                                }
+
+                                return (
                                     <section key={dept.id} id={`dept-${dept.id}`} className="scroll-mt-36">
                                         <div className="flex items-center mb-8">
                                             <div className="w-1.5 h-8 bg-primary-600 rounded-full mr-4 shadow-md shadow-primary-600/20"></div>
@@ -196,72 +303,11 @@ export default function Staff() {
                                             viewport={{ once: false, amount: 0.05, margin: "-40px 0px" }}
                                             className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"
                                         >
-                                            {dept.personnel.map((staff, idx) => {
-                                                // Generate a scattered rotation angle for Polaroid styling
-                                                const tilts = [-1.5, 1.2, -0.8, 1.5, -1.2, 0.8];
-                                                const rotation = tilts[idx % tilts.length];
-
-                                                return (
-                                                    <motion.div
-                                                        key={staff.id}
-                                                        variants={cardVariants}
-                                                        whileHover={{
-                                                            scale: 1.04,
-                                                            rotate: 0,
-                                                            y: -8,
-                                                            zIndex: 10,
-                                                            transition: { duration: 0.25, ease: "easeOut" }
-                                                        }}
-                                                        style={{ rotate: rotation }}
-                                                        className="group h-full origin-center"
-                                                    >
-                                                        <div className="bg-[#fcfcf9] dark:bg-slate-900 p-3 pb-6 sm:p-4 sm:pb-8 border border-slate-200/80 dark:border-slate-800 shadow-md hover:shadow-2xl transition-shadow duration-300 flex flex-col h-full relative rounded-sm">
-                                                            {/* Sticky Tape Decoration */}
-                                                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5 bg-white/35 dark:bg-slate-800/35 border-x border-slate-300/20 dark:border-slate-700/20 backdrop-blur-[1px] rotate-[-1deg] shadow-[0_1px_2px_rgba(0,0,0,0.03)] z-20 pointer-events-none"></div>
-
-                                                            {/* Photo Area */}
-                                                            <div className="aspect-[4/5] relative bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-800/60 overflow-hidden shadow-inner">
-                                                                {staff.image ? (
-                                                                    <img
-                                                                        src={`${import.meta.env.VITE_API_URL}/storage/${staff.image}`}
-                                                                        alt={staff.name}
-                                                                        className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-                                                                    />
-                                                                ) : (
-                                                                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-700">
-                                                                        <Users size={32} strokeWidth={1.5} />
-                                                                        <span className="text-[9px] font-bold mt-2 uppercase tracking-widest opacity-65">No Image</span>
-                                                                    </div>
-                                                                )}
-                                                                {/* Photo Sheen / Matte Reflection Overlay */}
-                                                                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 dark:via-white/2 dark:to-white/5 pointer-events-none"></div>
-                                                                <div className="absolute inset-0 bg-black/5 dark:bg-black/10 mix-blend-overlay pointer-events-none"></div>
-                                                            </div>
-
-                                                            {/* Text Content (Polaroid Caption style) */}
-                                                            <div className="pt-4 pb-1 px-1 flex flex-col flex-1 items-center text-center">
-                                                                <h3 className="text-sm sm:text-base font-bold text-slate-800 dark:text-white mb-0.5 tracking-tight line-clamp-1">
-                                                                    {staff.name}
-                                                                </h3>
-                                                                <p className="text-[12px] font-medium text-slate-400 mb-3">
-                                                                    {staff.nickname ? `(${staff.nickname})` : " "}
-                                                                </p>
-
-                                                                {/* Position Badge - Styled like a tape label marker */}
-                                                                <div className="mt-auto w-full px-2 py-1.5 bg-slate-800 dark:bg-slate-950 text-slate-100 rounded-sm border-t border-b border-slate-700/50 shadow-[0_1px_2px_rgba(0,0,0,0.15)] flex items-center justify-center">
-                                                                    <span className="text-[10px] sm:text-[11px] font-bold tracking-wider block leading-tight truncate uppercase">
-                                                                        {staff.position || "บุคลากร"}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </motion.div>
-                                                );
-                                            })}
+                                            {dept.personnel.map((staff, idx) => renderStaffCard(staff, idx))}
                                         </motion.div>
                                     </section>
-                                )
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 </div>

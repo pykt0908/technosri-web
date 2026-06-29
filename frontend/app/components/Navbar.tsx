@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "./ThemeToggle";
 import toast from "react-hot-toast";
@@ -12,6 +12,7 @@ export default function Navbar() {
     const [activeHoveredMenu, setActiveHoveredMenu] = useState<string | null>(null);
     const [openMobileSubmenu, setOpenMobileSubmenu] = useState<string | null>(null);
     const [downloadCategories, setDownloadCategories] = useState<any[]>([]);
+    const location = useLocation();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -67,12 +68,20 @@ export default function Navbar() {
                 { name: "ข้อมูลวิทยาลัย", href: "/about", icon: "fas fa-university" },
                 { name: "ตราประจำวิทยาลัย", href: "/about/emblem", icon: "fas fa-shield-alt" },
                 { name: "เพลงประจำวิทยาลัย", href: "/about/songs", icon: "fas fa-music" },
-                { name: "ข้อมูลสถิตินักเรียนและบุคลากร", href: "/about/statistics", icon: "fas fa-chart-bar" }
+                { name: "ข้อมูลสถิตินักเรียนและบุคลากร", href: "/about/statistics", icon: "fas fa-chart-bar" },
+                { name: "รายงานการประเมินตนเอง (SAR)", href: "/about/sar", icon: "fas fa-file-contract" }
             ]
         },
         { name: "หลักสูตร", href: "/programs", icon: "fas fa-graduation-cap" },
-        { name: "บุคลากร", href: "/personnel", icon: "fas fa-users" },
-        { name: "ร่วมงานกับเรา", href: "/join-us", icon: "fas fa-briefcase" },
+        { 
+            name: "บุคลากร", 
+            href: "/personnel", 
+            icon: "fas fa-users",
+            submenu: [
+                { name: "ข้อมูลบุคลากร", href: "/personnel", icon: "fas fa-users" },
+                { name: "ร่วมงานกับเรา", href: "/join-us", icon: "fas fa-briefcase" }
+            ]
+        },
         { name: "ดาวน์โหลด", href: "/downloads", icon: "fas fa-cloud-download-alt" },
         { name: "V-Cop", href: "https://backend.v-cop.go.th/LoginStudent", icon: "fas fa-user-graduate" },
         { name: "ติดต่อเรา", href: "/contact", icon: "fas fa-envelope" },
@@ -106,6 +115,12 @@ export default function Navbar() {
                         {navLinks.map((link) => {
                             if (link.submenu) {
                                 const isHovered = activeHoveredMenu === link.name;
+                                const isSubmenuActive = link.submenu.some(subItem => {
+                                    if (subItem.href === "/about" || subItem.href === "/personnel") {
+                                        return location.pathname === subItem.href;
+                                    }
+                                    return location.pathname.startsWith(subItem.href);
+                                });
                                 return (
                                     <div
                                         key={link.name}
@@ -114,13 +129,17 @@ export default function Navbar() {
                                         onMouseLeave={() => setActiveHoveredMenu(null)}
                                     >
                                         <button
-                                            className="text-[0.8rem] font-bold transition-colors flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none"
+                                            className={`text-[0.8rem] font-bold transition-colors flex items-center space-x-2 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none ${
+                                                isSubmenuActive
+                                                    ? "text-primary-600 dark:text-primary-400"
+                                                    : "text-gray-700 dark:text-gray-300"
+                                            }`}
                                             aria-haspopup="true"
                                             aria-expanded={isHovered}
                                         >
                                             <i className={`${link.icon} text-xs opacity-60`} aria-hidden="true"></i>
                                             <span>{link.name}</span>
-                                            <i className={`fas fa-chevron-down text-[9px] opacity-60 transition-transform duration-300 ${isHovered ? "rotate-180 text-primary-600" : ""}`} aria-hidden="true"></i>
+                                            <i className={`fas fa-chevron-down text-[9px] opacity-60 transition-transform duration-300 ${isHovered ? "rotate-180 text-primary-600" : ""} ${isSubmenuActive ? "text-primary-600" : ""}`} aria-hidden="true"></i>
                                         </button>
 
                                         <AnimatePresence>
@@ -137,7 +156,7 @@ export default function Navbar() {
                                                         <NavLink
                                                             key={subItem.href}
                                                             to={subItem.href}
-                                                            end={subItem.href === "/about"}
+                                                            end={subItem.href === "/about" || subItem.href === "/personnel"}
                                                             className={({ isActive }) =>
                                                                 `flex items-center space-x-3 px-4 py-2.5 mx-2 rounded-xl text-xs font-bold transition-all ${
                                                                     isActive
@@ -248,18 +267,28 @@ export default function Navbar() {
                         {navLinks.map((link, index) => {
                             if (link.submenu) {
                                 const isMobileOpen = openMobileSubmenu === link.name;
+                                const isSubmenuActive = link.submenu.some(subItem => {
+                                    if (subItem.href === "/about" || subItem.href === "/personnel") {
+                                        return location.pathname === subItem.href;
+                                    }
+                                    return location.pathname.startsWith(subItem.href);
+                                });
                                 return (
                                     <div key={link.name} className="flex flex-col space-y-2">
                                         <button
                                             onClick={() => setOpenMobileSubmenu(isMobileOpen ? null : link.name)}
-                                            className="text-lg font-bold uppercase transition-all flex items-center justify-between w-full text-left text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none"
+                                            className={`text-lg font-bold uppercase transition-all flex items-center justify-between w-full text-left hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none ${
+                                                isSubmenuActive
+                                                    ? "text-primary-600 dark:text-primary-400"
+                                                    : "text-gray-700 dark:text-gray-300"
+                                            }`}
                                             style={{ transitionDelay: `${index * 50}ms` }}
                                         >
                                             <span className="flex items-center space-x-3">
                                                 <i className={`${link.icon} text-lg opacity-60`} aria-hidden="true"></i>
                                                 <span>{link.name}</span>
                                             </span>
-                                            <i className={`fas fa-chevron-down text-sm transition-transform duration-300 ${isMobileOpen ? "rotate-180 text-primary-600" : ""}`} aria-hidden="true"></i>
+                                            <i className={`fas fa-chevron-down text-sm transition-transform duration-300 ${isMobileOpen ? "rotate-180 text-primary-600" : ""} ${isSubmenuActive ? "text-primary-600" : ""}`} aria-hidden="true"></i>
                                         </button>
 
                                         <AnimatePresence>
@@ -284,7 +313,7 @@ export default function Navbar() {
                                                                     isActive ? "text-primary-600" : "text-gray-500 dark:text-gray-400 hover:text-primary-600"
                                                                 }`
                                                             }
-                                                            end={subItem.href === "/about"}
+                                                            end={subItem.href === "/about" || subItem.href === "/personnel"}
                                                         >
                                                             <i className={`${subItem.icon} text-xs opacity-60`} aria-hidden="true"></i>
                                                             <span>{subItem.name}</span>

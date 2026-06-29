@@ -219,6 +219,7 @@ export default function CalendarSection() {
                                 eventClick={handleEventClick}
                                 locale="th"
                                 fixedWeekCount={false}
+                                displayEventTime={false}
                             />
                         )}
                     </div>

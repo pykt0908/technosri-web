@@ -20,6 +20,8 @@ use App\Http\Controllers\DownloadDocumentController;
 use App\Http\Controllers\SchoolStatisticController;
 use App\Http\Controllers\HomePopupController;
 use App\Http\Controllers\CalendarEventController;
+use App\Http\Controllers\SarController;
+
 
 // Public Routes
 Route::get('/school-statistics', [SchoolStatisticController::class, 'index']);
@@ -32,6 +34,7 @@ Route::get('/news/v/{slug}', [NewsController::class, 'showBySlug']);
 Route::get('/carousels/active', [CarouselController::class, 'active']);
 Route::get('/popups/active', [HomePopupController::class, 'active']);
 Route::get('/calendar-events', [CalendarEventController::class, 'index']);
+Route::get('/sars', [SarController::class, 'index']);
 
 // Public Download Routes
 Route::get('/downloads/categories', [DownloadCategoryController::class, 'index']);
@@ -114,4 +117,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin Calendar Events Routes
     Route::get('/admin/calendar-events', [CalendarEventController::class, 'adminIndex']);
     Route::apiResource('calendar-events', CalendarEventController::class)->except(['index']);
+
+    // Admin SAR Routes
+    Route::apiResource('sars', SarController::class)->except(['index']);
 });

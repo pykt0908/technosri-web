@@ -8,6 +8,8 @@ backend/Archive.zip
 backend/project.tar
 song/Archive.zip
 frontend/lighthouse-report*.json
+2026-10-14-LOGO Technosri/
+*.ai
 # Built static assets in httpdocs root (deployed via deploy.sh)
 /assets/
 /fonts/

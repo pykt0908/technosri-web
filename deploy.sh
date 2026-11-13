@@ -8,7 +8,7 @@ git pull origin main
 
 echo "==> 2. Building Frontend (React Router SPA)..."
 cd frontend
-npm install --no-audit --no-fund
+npm install --legacy-peer-deps --no-audit --no-fund
 npm run build
 
 echo "==> 3. Copying Frontend build to httpdocs root..."
@@ -19,3 +19,4 @@ echo "==> 4. Fixing file ownership (academic:psacln)..."
 chown -R academic:psacln assets index.html favicon.ico fonts images logo logo_sriracha.png robots.txt song backend frontend 2>/dev/null || true
 
 echo "✅ Deployment completed successfully!"
+

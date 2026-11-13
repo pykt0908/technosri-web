@@ -121,3 +121,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin SAR Routes
     Route::apiResource('sars', SarController::class)->except(['index']);
 });
+
+Route::get('/run-migration', function () {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        return 'Database migrated successfully!';
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});

@@ -29,6 +29,7 @@ export default function Sitemap() {
             links: [
                 { name: "ดาวน์โหลดเอกสาร (Downloads)", path: "/downloads" },
                 { name: "ระบบ V-Cop Student (V-Cop Portal)", path: "https://backend.v-cop.go.th/LoginStudent" },
+                { name: "ระบบสอบออนไลน์ (Online Examination)", path: "https://exam.technosriracha.ac.th/" },
             ]
         },
         {

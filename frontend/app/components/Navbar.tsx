@@ -49,6 +49,7 @@ export default function Navbar() {
         name: string;
         href: string;
         icon: string;
+        target?: string;
     }
 
     interface NavLinkItem {
@@ -66,6 +67,7 @@ export default function Navbar() {
             icon: "fas fa-info-circle",
             submenu: [
                 { name: "ข้อมูลวิทยาลัย", href: "/about", icon: "fas fa-university" },
+                { name: "ปฏิทินวิทยาลัย", href: "/about/calendar", icon: "fas fa-calendar-alt" },
                 { name: "ตราประจำวิทยาลัย", href: "/about/emblem", icon: "fas fa-shield-alt" },
                 { name: "เพลงประจำวิทยาลัย", href: "/about/songs", icon: "fas fa-music" },
                 { name: "ข้อมูลสถิตินักเรียนและบุคลากร", href: "/about/statistics", icon: "fas fa-chart-bar" },
@@ -82,8 +84,16 @@ export default function Navbar() {
                 { name: "ร่วมงานกับเรา", href: "/join-us", icon: "fas fa-briefcase" }
             ]
         },
+        { 
+            name: "นักศึกษา", 
+            href: "#", 
+            icon: "fas fa-user-graduate",
+            submenu: [
+                { name: "ระบบ V-COP", href: "https://backend.v-cop.go.th/LoginStudent", icon: "fas fa-id-card", target: "_blank" },
+                { name: "ระบบสอบออนไลน์", href: "https://exam.technosriracha.ac.th/", icon: "fas fa-file-signature", target: "_blank" }
+            ]
+        },
         { name: "ดาวน์โหลด", href: "/downloads", icon: "fas fa-cloud-download-alt" },
-        { name: "V-Cop", href: "https://backend.v-cop.go.th/LoginStudent", icon: "fas fa-user-graduate" },
         { name: "ติดต่อเรา", href: "/contact", icon: "fas fa-envelope" },
     ];
 
@@ -116,6 +126,7 @@ export default function Navbar() {
                             if (link.submenu) {
                                 const isHovered = activeHoveredMenu === link.name;
                                 const isSubmenuActive = link.submenu.some(subItem => {
+                                    if (subItem.href.startsWith("http") || subItem.href === "#") return false;
                                     if (subItem.href === "/about" || subItem.href === "/personnel") {
                                         return location.pathname === subItem.href;
                                     }
@@ -149,28 +160,50 @@ export default function Navbar() {
                                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                                     exit={{ opacity: 0, y: 15, scale: 0.95 }}
                                                     transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                                                    className="absolute left-1/2 -translate-x-1/2 top-full w-52 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-100 dark:border-slate-800 rounded-2xl shadow-xl py-3 z-[60]"
+                                                    className="absolute left-1/2 -translate-x-1/2 top-full w-56 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-100 dark:border-slate-800 rounded-2xl shadow-xl py-3 z-[60]"
                                                     role="menu"
                                                 >
-                                                    {link.submenu.map((subItem) => (
-                                                        <NavLink
-                                                            key={subItem.href}
-                                                            to={subItem.href}
-                                                            end={subItem.href === "/about" || subItem.href === "/personnel"}
-                                                            className={({ isActive }) =>
-                                                                `flex items-center space-x-3 px-4 py-2.5 mx-2 rounded-xl text-xs font-bold transition-all ${
-                                                                    isActive
-                                                                        ? "bg-primary-50 dark:bg-primary-950/40 text-primary-600"
-                                                                        : "text-gray-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-primary-600"
-                                                                }`
-                                                            }
-                                                            role="menuitem"
-                                                            onClick={() => setActiveHoveredMenu(null)}
-                                                        >
-                                                            <i className={`${subItem.icon} opacity-60 text-xs`} aria-hidden="true"></i>
-                                                            <span>{subItem.name}</span>
-                                                        </NavLink>
-                                                    ))}
+                                                    {link.submenu.map((subItem) => {
+                                                        const isExternal = subItem.href.startsWith("http") || subItem.target === "_blank";
+                                                        if (isExternal) {
+                                                            return (
+                                                                <a
+                                                                    key={subItem.href}
+                                                                    href={subItem.href}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="flex items-center justify-between px-4 py-2.5 mx-2 rounded-xl text-xs font-bold transition-all text-gray-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-primary-600"
+                                                                    role="menuitem"
+                                                                    onClick={() => setActiveHoveredMenu(null)}
+                                                                >
+                                                                    <div className="flex items-center space-x-3">
+                                                                        <i className={`${subItem.icon} opacity-60 text-xs`} aria-hidden="true"></i>
+                                                                        <span>{subItem.name}</span>
+                                                                    </div>
+                                                                    <i className="fas fa-arrow-up-right-from-square text-[10px] opacity-40" aria-hidden="true"></i>
+                                                                </a>
+                                                            );
+                                                        }
+                                                        return (
+                                                            <NavLink
+                                                                key={subItem.href}
+                                                                to={subItem.href}
+                                                                end={subItem.href === "/about" || subItem.href === "/personnel"}
+                                                                className={({ isActive }) =>
+                                                                    `flex items-center space-x-3 px-4 py-2.5 mx-2 rounded-xl text-xs font-bold transition-all ${
+                                                                        isActive
+                                                                            ? "bg-primary-50 dark:bg-primary-950/40 text-primary-600"
+                                                                            : "text-gray-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-primary-600"
+                                                                    }`
+                                                                }
+                                                                role="menuitem"
+                                                                onClick={() => setActiveHoveredMenu(null)}
+                                                            >
+                                                                <i className={`${subItem.icon} opacity-60 text-xs`} aria-hidden="true"></i>
+                                                                <span>{subItem.name}</span>
+                                                            </NavLink>
+                                                        );
+                                                    })}
                                                 </motion.div>
                                             )}
                                         </AnimatePresence>
@@ -268,6 +301,7 @@ export default function Navbar() {
                             if (link.submenu) {
                                 const isMobileOpen = openMobileSubmenu === link.name;
                                 const isSubmenuActive = link.submenu.some(subItem => {
+                                    if (subItem.href.startsWith("http") || subItem.href === "#") return false;
                                     if (subItem.href === "/about" || subItem.href === "/personnel") {
                                         return location.pathname === subItem.href;
                                     }
@@ -300,25 +334,49 @@ export default function Navbar() {
                                                     transition={{ duration: 0.25, ease: "easeInOut" }}
                                                     className="overflow-hidden pl-6 flex flex-col space-y-2 border-l-2 border-slate-100 dark:border-slate-800 ml-2"
                                                 >
-                                                    {link.submenu.map((subItem) => (
-                                                        <NavLink
-                                                            key={subItem.href}
-                                                            to={subItem.href}
-                                                            onClick={() => {
-                                                                setIsMenuOpen(false);
-                                                                setOpenMobileSubmenu(null);
-                                                            }}
-                                                            className={({ isActive }) =>
-                                                                `text-sm font-semibold transition-all flex items-center space-x-2.5 ${
-                                                                    isActive ? "text-primary-600" : "text-gray-500 dark:text-gray-400 hover:text-primary-600"
-                                                                }`
-                                                            }
-                                                            end={subItem.href === "/about" || subItem.href === "/personnel"}
-                                                        >
-                                                            <i className={`${subItem.icon} text-xs opacity-60`} aria-hidden="true"></i>
-                                                            <span>{subItem.name}</span>
-                                                        </NavLink>
-                                                    ))}
+                                                    {link.submenu.map((subItem) => {
+                                                        const isExternal = subItem.href.startsWith("http") || subItem.target === "_blank";
+                                                        if (isExternal) {
+                                                            return (
+                                                                <a
+                                                                    key={subItem.href}
+                                                                    href={subItem.href}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    onClick={() => {
+                                                                        setIsMenuOpen(false);
+                                                                        setOpenMobileSubmenu(null);
+                                                                    }}
+                                                                    className="text-sm font-semibold transition-all flex items-center justify-between pr-4 py-1 text-gray-500 dark:text-gray-400 hover:text-primary-600"
+                                                                >
+                                                                    <span className="flex items-center space-x-2.5">
+                                                                        <i className={`${subItem.icon} text-xs opacity-60`} aria-hidden="true"></i>
+                                                                        <span>{subItem.name}</span>
+                                                                    </span>
+                                                                    <i className="fas fa-arrow-up-right-from-square text-[10px] opacity-40" aria-hidden="true"></i>
+                                                                </a>
+                                                            );
+                                                        }
+                                                        return (
+                                                            <NavLink
+                                                                key={subItem.href}
+                                                                to={subItem.href}
+                                                                onClick={() => {
+                                                                    setIsMenuOpen(false);
+                                                                    setOpenMobileSubmenu(null);
+                                                                }}
+                                                                className={({ isActive }) =>
+                                                                    `text-sm font-semibold transition-all flex items-center space-x-2.5 ${
+                                                                        isActive ? "text-primary-600" : "text-gray-500 dark:text-gray-400 hover:text-primary-600"
+                                                                    }`
+                                                                }
+                                                                end={subItem.href === "/about" || subItem.href === "/personnel"}
+                                                            >
+                                                                <i className={`${subItem.icon} text-xs opacity-60`} aria-hidden="true"></i>
+                                                                <span>{subItem.name}</span>
+                                                            </NavLink>
+                                                        );
+                                                    })}
                                                 </motion.div>
                                             )}
                                         </AnimatePresence>

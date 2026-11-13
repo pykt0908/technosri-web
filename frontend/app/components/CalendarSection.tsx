@@ -19,7 +19,11 @@ interface CalendarEvent {
     link_url: string | null;
 }
 
-export default function CalendarSection() {
+interface CalendarSectionProps {
+    isPage?: boolean;
+}
+
+export default function CalendarSection({ isPage = false }: CalendarSectionProps) {
     const [events, setEvents] = useState<CalendarEvent[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
@@ -97,7 +101,7 @@ export default function CalendarSection() {
     };
 
     return (
-        <section id="calendar" className="py-24 bg-slate-50 dark:bg-slate-900/40 border-y border-slate-100 dark:border-slate-800/80">
+        <section id={isPage ? undefined : "calendar"} className={isPage ? "py-0 bg-transparent border-0" : "py-24 bg-slate-50 dark:bg-slate-900/40 border-y border-slate-100 dark:border-slate-800/80"}>
             {/* Custom styles to override FullCalendar CSS */}
             <style>{`
                 .fc {
@@ -184,19 +188,21 @@ export default function CalendarSection() {
                 }
             `}</style>
 
-            <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
+            <div className={isPage ? "" : "max-w-[1440px] mx-auto px-6 lg:px-12"}>
                 {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-end mb-12">
-                    <Reveal>
-                        <span className="text-primary-500 font-black tracking-[0.3em] uppercase text-xs mb-3 block">Activities & Schedule</span>
-                        <h2 className="text-4xl md:text-5xl font-black uppercase leading-none dark:text-white">ปฏิทินวิทยาลัย</h2>
-                    </Reveal>
-                    <Reveal delay={0.2}>
-                        <p className="text-gray-500 dark:text-gray-400 max-w-sm font-medium mt-4 md:mt-0 text-sm md:text-right">
-                            ตารางงาน วันสำคัญ และกิจกรรมวิชาการ/สันทนาการต่างๆ ของวิทยาลัยเทคโนโลยีศรีราชา
-                        </p>
-                    </Reveal>
-                </div>
+                {!isPage && (
+                    <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+                        <Reveal>
+                            <span className="text-primary-500 font-black tracking-[0.3em] uppercase text-xs mb-3 block">Activities & Schedule</span>
+                            <h2 className="text-4xl md:text-5xl font-black uppercase leading-none dark:text-white">ปฏิทินวิทยาลัย</h2>
+                        </Reveal>
+                        <Reveal delay={0.2}>
+                            <p className="text-gray-500 dark:text-gray-400 max-w-sm font-medium mt-4 md:mt-0 text-sm md:text-right">
+                                ตารางงาน วันสำคัญ และกิจกรรมวิชาการ/สันทนาการต่างๆ ของวิทยาลัยเทคโนโลยีศรีราชา
+                            </p>
+                        </Reveal>
+                    </div>
+                )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
                     {/* Left Column: FullCalendar Grid */}
@@ -230,7 +236,7 @@ export default function CalendarSection() {
                             <div className="flex items-center justify-between mb-6 shrink-0">
                                 <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight flex items-center">
                                     <CalendarIcon className="mr-2 text-primary-500" size={20} />
-                                    กิจกรรมเร็วๆ นี้
+                                    กิจกรรมเร็ว ๆ นี้
                                 </h3>
                             </div>
 
@@ -270,7 +276,7 @@ export default function CalendarSection() {
 
                                                 {/* Content */}
                                                 <div className="flex-1 min-w-0">
-                                                    <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 group-hover:text-primary-500 transition-colors line-clamp-1 leading-snug">
+                                                    <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 group-hover:text-primary-500 transition-colors leading-snug">
                                                         {event.title}
                                                     </h4>
                                                     <div className="flex flex-col gap-1 mt-2 text-xs text-slate-400">
@@ -280,9 +286,9 @@ export default function CalendarSection() {
                                                             {event.end_date && ` - ${formatTimeThai(event.end_date)}`}
                                                         </span>
                                                         {event.location && (
-                                                            <span className="flex items-center truncate">
-                                                                <MapPin size={12} className="mr-1.5 shrink-0" />
-                                                                <span className="truncate">{event.location}</span>
+                                                            <span className="flex items-start">
+                                                                <MapPin size={12} className="mr-1.5 shrink-0 mt-0.5" />
+                                                                <span>{event.location}</span>
                                                             </span>
                                                         )}
                                                     </div>

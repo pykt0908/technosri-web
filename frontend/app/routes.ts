@@ -5,6 +5,7 @@ export default [
     route("news", "routes/news-all.tsx"),
     route("news/:slug", "routes/news-detail.tsx"),
     route("about", "routes/about.tsx"),
+    route("about/calendar", "routes/about-calendar.tsx"),
     route("about/emblem", "routes/college-emblem.tsx"),
     route("about/songs", "routes/college-songs.tsx"),
     route("about/statistics", "routes/about-statistics.tsx"),
@@ -41,4 +42,5 @@ export default [
         route("statistics", "routes/admin/statistics.tsx"),
     ]),
 ] satisfies RouteConfig;
+
 

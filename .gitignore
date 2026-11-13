@@ -1,5 +1,21 @@
 .DS_Store
 **/.DS_Store
+**/._*
+__MACOSX/
+**/__MACOSX/
 bn-upload/
 backend/Archive.zip
+backend/project.tar
+song/Archive.zip
 frontend/lighthouse-report*.json
+# Built static assets in httpdocs root (deployed via deploy.sh)
+/assets/
+/fonts/
+/images/
+/logo/
+/song/
+/index.html
+/favicon.ico
+/logo_sriracha.png
+/robots.txt
+/.htaccess

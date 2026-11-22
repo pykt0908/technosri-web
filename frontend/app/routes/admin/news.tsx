@@ -12,7 +12,7 @@ import {
 } from "@tanstack/react-table";
 import type { SortingState } from "@tanstack/react-table";
 import toast from "react-hot-toast";
-import { Plus, Search, FileText, Edit, Trash2, ExternalLink, Eye } from "lucide-react";
+import { Plus, Search, FileText, Edit, Trash2, ExternalLink, Eye, Camera } from "lucide-react";
 
 interface News {
     id: number;
@@ -22,6 +22,7 @@ interface News {
     created_at: string;
     author: { name: string };
     views: number;
+    google_photo_url?: string | null;
 }
 
 export default function NewsList() {
@@ -58,8 +59,21 @@ export default function NewsList() {
         columnHelper.accessor("title", {
             header: "หัวข้อข่าว",
             cell: info => (
-                <div className="flex flex-col">
-                    <span className="font-bold text-slate-700 dark:text-white line-clamp-1">{info.getValue()}</span>
+                <div className="flex flex-col gap-0.5">
+                    <div className="flex items-center gap-2">
+                        <span className="font-bold text-slate-700 dark:text-white line-clamp-1">{info.getValue()}</span>
+                        {info.row.original.google_photo_url && (
+                            <a 
+                                href={info.row.original.google_photo_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 border border-blue-200/50 hover:bg-blue-100 transition-colors"
+                                title="เปิดดูอัลบั้ม Google Photos ในแท็บใหม่"
+                            >
+                                <Camera size={10} /> Photos
+                            </a>
+                        )}
+                    </div>
                     <span className="text-[10px] text-slate-400 font-mono">/{info.row.original.slug}</span>
                 </div>
             ),

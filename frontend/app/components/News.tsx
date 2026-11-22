@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import Reveal from "./Reveal";
-import { ArrowUpRight, Calendar, Clock } from "lucide-react";
+import { ArrowUpRight, Calendar, Clock, Camera } from "lucide-react";
 
 interface NewsItem {
     id: number;
     title: string;
     slug: string;
     featured_image: string | null;
+    google_photo_url?: string | null;
     published_at?: string;
     created_at?: string;
 }
@@ -152,9 +153,16 @@ export default function News({ initialData = [] }: { initialData?: NewsItem[] })
 
                                         {/* Text Content */}
                                         <div className="mt-auto p-8 sm:p-12 z-10 text-white relative">
-                                            <span className="inline-flex items-center px-3.5 py-1 bg-primary-600 text-white text-[9px] font-black tracking-widest uppercase rounded-full mb-4 shadow-md shadow-primary-600/20">
-                                                ข่าวเด่นประจำวัน
-                                            </span>
+                                            <div className="flex flex-wrap items-center gap-2 mb-4">
+                                                <span className="inline-flex items-center px-3.5 py-1 bg-primary-600 text-white text-[9px] font-black tracking-widest uppercase rounded-full shadow-md shadow-primary-600/20">
+                                                    ข่าวเด่นประจำวัน
+                                                </span>
+                                                {news[0].google_photo_url && (
+                                                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600/90 text-white text-[9px] font-black tracking-wider rounded-full shadow-md backdrop-blur-sm">
+                                                        <Camera size={11} /> อัลบั้มภาพ Google Photos
+                                                    </span>
+                                                )}
+                                            </div>
                                             <h3 className="text-2xl sm:text-3xl font-black mb-4 leading-tight group-hover:text-primary-300 transition-colors line-clamp-2">
                                                 {news[0].title}
                                             </h3>
@@ -201,9 +209,16 @@ export default function News({ initialData = [] }: { initialData?: NewsItem[] })
 
                                             {/* Text Content */}
                                             <div className="mt-auto p-6 sm:p-8 z-10 text-white relative">
-                                                <span className="inline-flex items-center px-3.5 py-1 bg-primary-600 text-white text-[9px] font-black tracking-widest uppercase rounded-full mb-3 shadow-md shadow-primary-600/20">
-                                                    ข่าวสารล่าสุด
-                                                </span>
+                                                <div className="flex flex-wrap items-center gap-2 mb-3">
+                                                    <span className="inline-flex items-center px-3.5 py-1 bg-primary-600 text-white text-[9px] font-black tracking-widest uppercase rounded-full shadow-md shadow-primary-600/20">
+                                                        ข่าวสารล่าสุด
+                                                    </span>
+                                                    {item.google_photo_url && (
+                                                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-blue-600/90 text-white text-[9px] font-bold rounded-full shadow-md backdrop-blur-sm">
+                                                            <Camera size={11} /> อัลบั้มภาพ
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <h3 className="text-lg sm:text-xl font-black mb-3 leading-tight group-hover:text-primary-300 transition-colors line-clamp-2">
                                                     {item.title}
                                                 </h3>
@@ -254,9 +269,16 @@ export default function News({ initialData = [] }: { initialData?: NewsItem[] })
 
                                                 {/* Text Content */}
                                                 <div className="mt-auto p-8 sm:p-10 z-10 text-white relative">
-                                                    <span className="inline-flex items-center px-3.5 py-1 bg-primary-600 text-white text-[9px] font-black tracking-widest uppercase rounded-full mb-4 shadow-md shadow-primary-600/20">
-                                                        ข่าวเด่นประจำวัน
-                                                    </span>
+                                                    <div className="flex flex-wrap items-center gap-2 mb-4">
+                                                        <span className="inline-flex items-center px-3.5 py-1 bg-primary-600 text-white text-[9px] font-black tracking-widest uppercase rounded-full shadow-md shadow-primary-600/20">
+                                                            ข่าวเด่นประจำวัน
+                                                        </span>
+                                                        {news[0].google_photo_url && (
+                                                            <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600/90 text-white text-[9px] font-black tracking-wider rounded-full shadow-md backdrop-blur-sm">
+                                                                <Camera size={11} /> อัลบั้มภาพ Google Photos
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                     <h3 className="text-xl sm:text-2xl lg:text-3xl font-black mb-4 leading-tight group-hover:text-primary-300 transition-colors line-clamp-2">
                                                         {news[0].title}
                                                     </h3>

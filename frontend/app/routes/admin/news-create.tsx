@@ -20,7 +20,7 @@ import {
     ChevronLeft, Globe, Underline as UnderlineIcon,
     Tag, Table as TableIcon, PlusSquare, MinusSquare, AlertCircle, Link2, Loader2,
     AlignLeft, AlignCenter, AlignRight, AlignJustify, Calendar, FileText, X,
-    GraduationCap, Minus, LayoutGrid, RowsIcon, Columns, Trash2, Plus
+    GraduationCap, Minus, LayoutGrid, RowsIcon, Columns, Trash2, Plus, Camera, ExternalLink
 } from "lucide-react";
 
 const FONT_FAMILIES = [
@@ -230,6 +230,7 @@ export default function NewsCreate() {
     const [slug, setSlug] = useState("");
     const [status, setStatus] = useState("draft");
     const [publishedAt, setPublishedAt] = useState("");
+    const [googlePhotoUrl, setGooglePhotoUrl] = useState("");
     const [featuredImage, setFeaturedImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     
@@ -337,6 +338,9 @@ export default function NewsCreate() {
         formData.append("status", status);
         if (publishedAt) {
             formData.append("published_at", publishedAt);
+        }
+        if (googlePhotoUrl.trim()) {
+            formData.append("google_photo_url", googlePhotoUrl.trim());
         }
         formData.append("meta_title", metaTitle);
         formData.append("meta_description", metaDesc);
@@ -532,6 +536,45 @@ export default function NewsCreate() {
                                         </div>
                                     ))}
                                 </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Google Photos Album Link Card */}
+                    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center">
+                                <Camera size={14} className="mr-2 text-primary-500" /> ลิงก์ Google Photos (อัลบั้มกิจกรรม)
+                            </h3>
+                            <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                                แนะนำสำหรับกิจกรรม
+                            </span>
+                        </div>
+                        <div className="p-6 space-y-3">
+                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                                หากมีรูปถ่ายกิจกรรมจำนวนมาก สามารถนำลิงก์แชร์จากอัลบั้ม Google Photos มาใส่ที่นี่ เพื่อให้นักเรียนและผู้ปกครองคลิกดูและดาวน์โหลดรูปทั้งหมดได้ทันที
+                            </p>
+                            <div className="relative">
+                                <input 
+                                    type="url" 
+                                    value={googlePhotoUrl}
+                                    onChange={(e) => setGooglePhotoUrl(e.target.value)}
+                                    placeholder="https://photos.app.goo.gl/..." 
+                                    className="w-full text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg pl-3 pr-20 py-2.5 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-primary-500 font-mono"
+                                />
+                                {googlePhotoUrl && (
+                                    <a 
+                                        href={googlePhotoUrl} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 text-[10px] font-bold text-primary-600 dark:text-primary-400 hover:text-primary-700 bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 flex items-center gap-1 shadow-xs"
+                                    >
+                                        ทดสอบ <ExternalLink size={10} />
+                                    </a>
+                                )}
+                            </div>
+                            {validationErrors.google_photo_url && (
+                                <p className="text-[10px] text-red-500 font-bold italic">{validationErrors.google_photo_url[0]}</p>
                             )}
                         </div>
                     </div>

@@ -7,6 +7,7 @@ import Reveal from "../components/Reveal";
 const Calendar = Lucide.Calendar || Lucide.Clock;
 const ChevronRight = Lucide.ChevronRight || Lucide.ArrowRight;
 const Search = Lucide.Search || Lucide.Search;
+const Camera = Lucide.Camera || Lucide.Image;
 
 interface NewsItem {
     id: number;
@@ -14,6 +15,7 @@ interface NewsItem {
     slug: string;
     content: string;
     featured_image: string | null;
+    google_photo_url?: string | null;
     published_at: string;
     created_at: string;
 }
@@ -92,10 +94,16 @@ export default function NewsAll() {
                                                 {item.title.substring(0, 2)}
                                             </div>
                                         )}
-                                        <div className="absolute top-4 left-4">
-                                            <div className="px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black text-primary-600 uppercase tracking-widest shadow-sm">
+                                        <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                                            <div className="px-4 py-1.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-full text-[10px] font-black text-primary-600 dark:text-primary-400 uppercase tracking-widest shadow-sm">
                                                 STC News
                                             </div>
+                                            {item.google_photo_url && (
+                                                <div className="px-3 py-1.5 bg-blue-600/90 text-white backdrop-blur-md rounded-full text-[10px] font-black tracking-wider shadow-sm flex items-center gap-1">
+                                                    <Camera size={12} />
+                                                    <span>อัลบั้มภาพ</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="p-8">

@@ -6,6 +6,11 @@ cd /var/www/vhosts/technosriracha.ac.th/httpdocs
 echo "==> 1. Pulling latest code from Git..."
 git pull origin main
 
+echo "==> 1.1 Running Database Migrations..."
+cd backend
+php artisan migrate --force
+cd /var/www/vhosts/technosriracha.ac.th/httpdocs
+
 echo "==> 2. Building Frontend (React Router SPA)..."
 cd frontend
 npm install --legacy-peer-deps --no-audit --no-fund

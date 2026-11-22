@@ -16,6 +16,7 @@ class News extends Model
         'content',
         'featured_image',
         'gallery',
+        'google_photo_url',
         'status',
         'published_at',
         'meta_title',

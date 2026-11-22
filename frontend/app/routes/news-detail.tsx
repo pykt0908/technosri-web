@@ -15,7 +15,8 @@ import {
     ExternalLink,
     Bookmark,
     X,
-    LayoutGrid
+    LayoutGrid,
+    Camera
 } from "lucide-react";
 import Reveal from "../components/Reveal";
 import toast from "react-hot-toast";
@@ -26,6 +27,7 @@ interface NewsItem {
     content: string;
     featured_image: string | null;
     gallery?: string[] | null;
+    google_photo_url?: string | null;
     published_at: string; // ใช้ published_at
     created_at: string;
     author?: { name: string };
@@ -248,6 +250,18 @@ export default function NewsDetail() {
                                 <User size={18} className="mr-2 text-primary-500" />
                                 {news.author?.name || "Administrator"}
                             </div>
+                            {news.google_photo_url && (
+                                <a 
+                                    href={news.google_photo_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center text-xs font-bold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950/50 hover:bg-primary-100 dark:hover:bg-primary-900/50 px-3.5 py-1.5 rounded-full border border-primary-500/20 transition-all hover:scale-105"
+                                >
+                                    <Camera size={14} className="mr-1.5" />
+                                    <span>อัลบั้ม Google Photos</span>
+                                    <ExternalLink size={11} className="ml-1 opacity-70" />
+                                </a>
+                            )}
                         </div>
                     </div>
                 </Reveal>
@@ -271,7 +285,7 @@ export default function NewsDetail() {
                 {/* News Gallery Grid with Overlay (Placed beautifully under the featured image) */}
                 {news.gallery && news.gallery.length > 0 && (
                     <Reveal delay={0.25}>
-                        <div className="mb-16">
+                        <div className="mb-12">
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                 {news.gallery.slice(0, 4).map((path, idx) => {
                                     const isLast = news.gallery.length > 4 && idx === 3;
@@ -301,6 +315,51 @@ export default function NewsDetail() {
                                         </div>
                                     );
                                 })}
+                            </div>
+                        </div>
+                    </Reveal>
+                )}
+
+                {/* Google Photos Album Banner */}
+                {news.google_photo_url && (
+                    <Reveal delay={0.28}>
+                        <div className="mb-14 p-6 sm:p-8 rounded-[2rem] bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-emerald-500/10 dark:from-blue-950/40 dark:via-indigo-950/40 dark:to-emerald-950/40 border border-blue-200/60 dark:border-blue-900/40 shadow-sm relative overflow-hidden group">
+                            <div className="absolute -right-10 -bottom-10 w-44 h-44 bg-blue-500/10 dark:bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+                                <div className="flex items-start sm:items-center space-x-4">
+                                    <div className="w-14 h-14 rounded-2xl bg-white dark:bg-slate-900 shadow-md border border-slate-100 dark:border-slate-800 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                        <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none">
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#f8fafc" className="dark:fill-slate-800" />
+                                            <path d="M12 3v9H3c0-4.97 4.03-9 9-9z" fill="#EA4335"/>
+                                            <path d="M21 12c0-4.97-4.03-9-9-9v9h9z" fill="#4285F4"/>
+                                            <path d="M12 21c4.97 0 9-4.03 9-9h-9v9z" fill="#34A853"/>
+                                            <path d="M3 12c0 4.97 4.03 9 9 9v-9H3z" fill="#FBBC05"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-primary-600 dark:text-primary-400 bg-primary-100/60 dark:bg-primary-900/40 px-2.5 py-0.5 rounded-full">
+                                                Google Photos
+                                            </span>
+                                            <span className="text-xs font-bold text-slate-400 dark:text-slate-500">อัลบั้มภาพกิจกรรม</span>
+                                        </div>
+                                        <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                                            ชมภาพบรรยากาศกิจกรรมทั้งหมด (ความละเอียดสูง)
+                                        </h3>
+                                        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium mt-0.5">
+                                            สามารถกดเข้าชมและบันทึกรูปภาพกิจกรรมต้นฉบับผ่าน Google Photos ได้ทันที
+                                        </p>
+                                    </div>
+                                </div>
+                                <a 
+                                    href={news.google_photo_url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-primary-600 to-blue-600 hover:from-primary-500 hover:to-blue-500 text-white font-black text-xs sm:text-sm py-3.5 px-6 rounded-2xl shadow-lg shadow-primary-500/25 transition-all hover:shadow-xl hover:shadow-primary-500/35 hover:-translate-y-0.5 active:translate-y-0 shrink-0 w-full md:w-auto cursor-pointer"
+                                >
+                                    <span>เปิดดูอัลบั้มภาพบน Google Photos</span>
+                                    <ExternalLink size={16} />
+                                </a>
                             </div>
                         </div>
                     </Reveal>
@@ -357,8 +416,18 @@ export default function NewsDetail() {
                                 />
                                 
                                 {/* Photo caption overlay */}
-                                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 text-white text-center">
+                                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-6 text-white text-center flex flex-col items-center gap-2">
                                     <p className="font-bold text-sm tracking-wide">ภาพที่ {activeImageIdx + 1} จากทั้งหมด {news.gallery.length} ภาพ</p>
+                                    {news.google_photo_url && (
+                                        <a 
+                                            href={news.google_photo_url} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white text-xs font-bold backdrop-blur transition-all active:scale-95"
+                                        >
+                                            <Camera size={14} /> ดูภาพกิจกรรมทั้งหมดบน Google Photos <ExternalLink size={12} />
+                                        </a>
+                                    )}
                                 </div>
                             </motion.div>
 

@@ -21,6 +21,7 @@ use App\Http\Controllers\SchoolStatisticController;
 use App\Http\Controllers\HomePopupController;
 use App\Http\Controllers\CalendarEventController;
 use App\Http\Controllers\SarController;
+use App\Http\Controllers\ActivityAlbumController;
 
 
 // Public Routes
@@ -35,6 +36,9 @@ Route::get('/carousels/active', [CarouselController::class, 'active']);
 Route::get('/popups/active', [HomePopupController::class, 'active']);
 Route::get('/calendar-events', [CalendarEventController::class, 'index']);
 Route::get('/sars', [SarController::class, 'index']);
+Route::get('/activity-albums', [ActivityAlbumController::class, 'index']);
+Route::get('/activity-albums/{id}', [ActivityAlbumController::class, 'show']);
+Route::post('/activity-albums/{id}/view', [ActivityAlbumController::class, 'incrementViews']);
 
 // Public Download Routes
 Route::get('/downloads/categories', [DownloadCategoryController::class, 'index']);
@@ -120,6 +124,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Admin SAR Routes
     Route::apiResource('sars', SarController::class)->except(['index']);
+
+    // Admin Activity Albums (Gallery) Routes
+    Route::get('/admin/activity-albums', [ActivityAlbumController::class, 'adminIndex']);
+    Route::post('/admin/activity-albums', [ActivityAlbumController::class, 'store']);
+    Route::post('/admin/activity-albums/{id}', [ActivityAlbumController::class, 'update']);
+    Route::put('/admin/activity-albums/{id}', [ActivityAlbumController::class, 'update']);
+    Route::delete('/admin/activity-albums/{id}', [ActivityAlbumController::class, 'destroy']);
 });
 
 Route::get('/run-migration', function () {

@@ -10,6 +10,7 @@ export default function Sitemap() {
                 { name: "หน้าแรก (Home)", path: "/" },
                 { name: "เกี่ยวกับวิทยาลัย (About)", path: "/about" },
                 { name: "ข่าวสารและกิจกรรม (News & Events)", path: "/news" },
+                { name: "ภาพกิจกรรม (Photo Albums)", path: "/gallery" },
                 { name: "ร่วมงานกับเรา (Careers)", path: "/join-us" },
                 { name: "ติดต่อสอบถาม (Contact)", path: "/contact" },
             ]

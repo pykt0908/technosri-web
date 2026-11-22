@@ -50,6 +50,7 @@ export default function AdminLayout() {
     const menuItems = [
         { title: "แดชบอร์ด", path: "/admin", icon: "fas fa-tachometer-alt" },
         { title: "ข่าวสาร", path: "/admin/news", icon: "fas fa-newspaper" },
+        { title: "อัลบั้มภาพกิจกรรม", path: "/admin/gallery", icon: "fas fa-camera-retro" },
         { title: "ภาพสไลด์", path: "/admin/carousel", icon: "fas fa-images" },
         { title: "ป๊อปอัปหน้าแรก", path: "/admin/popups", icon: "fas fa-window-restore" },
         { title: "ปฏิทินวิทยาลัย", path: "/admin/calendar", icon: "fas fa-calendar-alt" },

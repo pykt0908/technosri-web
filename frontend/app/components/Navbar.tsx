@@ -75,6 +75,7 @@ export default function Navbar() {
             ]
         },
         { name: "หลักสูตร", href: "/programs", icon: "fas fa-graduation-cap" },
+        { name: "ภาพกิจกรรม", href: "/gallery", icon: "fas fa-camera-retro" },
         { 
             name: "บุคลากร", 
             href: "/personnel", 

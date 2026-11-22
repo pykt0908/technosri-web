@@ -57,6 +57,11 @@ export default function Footer() {
                                 </NavLink>
                             </li>
                             <li>
+                                <NavLink to="/gallery" className="text-slate-400 hover:text-primary-500 transition-colors flex items-center group">
+                                    <ChevronRight size={14} className="mr-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" /> ภาพกิจกรรม (Google Photos)
+                                </NavLink>
+                            </li>
+                            <li>
                                 <NavLink to="/programs" className="text-slate-400 hover:text-primary-500 transition-colors flex items-center group">
                                     <ChevronRight size={14} className="mr-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" /> หลักสูตรที่เปิดสอน
                                 </NavLink>

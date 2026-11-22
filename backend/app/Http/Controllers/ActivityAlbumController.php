@@ -62,7 +62,7 @@ class ActivityAlbumController extends Controller
         ]);
 
         if (empty($validated['category'])) {
-            $validated['category'] = 'กิจกรรมวิทยาลัย';
+            $validated['category'] = null;
         }
 
         if ($request->hasFile('cover_image')) {
@@ -89,7 +89,7 @@ class ActivityAlbumController extends Controller
         ]);
 
         if (empty($validated['category'])) {
-            $validated['category'] = 'กิจกรรมวิทยาลัย';
+            $validated['category'] = null;
         }
 
         if ($request->hasFile('cover_image')) {

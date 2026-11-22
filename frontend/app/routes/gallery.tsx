@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Search, Calendar, Eye, ExternalLink, Camera, Sparkles, Filter, RefreshCw } from "lucide-react";
+import { Search, Calendar, Eye, ExternalLink, Camera, Sparkles } from "lucide-react";
 import Reveal from "../components/Reveal";
 
 interface ActivityAlbum {
@@ -9,25 +9,14 @@ interface ActivityAlbum {
     cover_image: string | null;
     google_photo_url: string;
     event_date: string | null;
-    category: string;
+    category?: string | null;
     views: number;
     created_at: string;
 }
 
-const CATEGORIES = [
-    { label: "ทั้งหมด", value: "all" },
-    { label: "กิจกรรมวิทยาลัย", value: "กิจกรรมวิทยาลัย" },
-    { label: "วิชาการ & ทักษะ", value: "วิชาการ & ทักษะ" },
-    { label: "กีฬา & นันทนาการ", value: "กีฬา & นันทนาการ" },
-    { label: "ทัศนศึกษา & ฝึกงาน", value: "ทัศนศึกษา & ฝึกงาน" },
-    { label: "จิตอาสา & คุณธรรม", value: "จิตอาสา & คุณธรรม" },
-    { label: "พิธีการ & เกียรติยศ", value: "พิธีการ & เกียรติยศ" },
-];
-
 export default function GalleryPage() {
     const [albums, setAlbums] = useState<ActivityAlbum[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedCategory, setSelectedCategory] = useState("all");
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
@@ -67,13 +56,12 @@ export default function GalleryPage() {
 
     const filteredAlbums = useMemo(() => {
         return albums.filter(album => {
-            const matchCategory = selectedCategory === "all" || album.category === selectedCategory;
             const matchSearch = searchTerm.trim() === "" || 
                 album.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (album.description && album.description.toLowerCase().includes(searchTerm.toLowerCase()));
-            return matchCategory && matchSearch;
+            return matchSearch;
         });
-    }, [albums, selectedCategory, searchTerm]);
+    }, [albums, searchTerm]);
 
     const formatDate = (dateStr: string | null) => {
         if (!dateStr) return null;
@@ -115,54 +103,32 @@ export default function GalleryPage() {
                     </Reveal>
                 </header>
 
-                {/* Filter and Search Bar */}
-                <div className="mb-10 space-y-5">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        {/* Search Input */}
-                        <div className="relative w-full md:w-96">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                            <input
-                                type="text"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder="ค้นหาชื่อกิจกรรม หรือคำอธิบาย..."
-                                className="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 shadow-sm transition-all"
-                            />
-                            {searchTerm && (
-                                <button
-                                    onClick={() => setSearchTerm("")}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md"
-                                >
-                                    ล้าง
-                                </button>
-                            )}
-                        </div>
-
-                        {/* Total Count */}
-                        <div className="flex items-center space-x-2 text-xs font-bold text-slate-500 dark:text-slate-400">
-                            <Sparkles size={14} className="text-primary-500" />
-                            <span>พบทั้งหมด {filteredAlbums.length} อัลบั้มกิจกรรม</span>
-                        </div>
+                {/* Search Bar & Stats */}
+                <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    {/* Search Input */}
+                    <div className="relative w-full md:w-96">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="ค้นหาชื่อกิจกรรม หรือคำอธิบาย..."
+                            className="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 shadow-sm transition-all"
+                        />
+                        {searchTerm && (
+                            <button
+                                onClick={() => setSearchTerm("")}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md"
+                            >
+                                ล้าง
+                            </button>
+                        )}
                     </div>
 
-                    {/* Category Tabs */}
-                    <div className="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-none">
-                        {CATEGORIES.map((cat) => {
-                            const isSelected = selectedCategory === cat.value;
-                            return (
-                                <button
-                                    key={cat.value}
-                                    onClick={() => setSelectedCategory(cat.value)}
-                                    className={`px-4 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all ${
-                                        isSelected
-                                            ? "bg-primary-600 text-white shadow-md shadow-primary-600/30"
-                                            : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-800"
-                                    }`}
-                                >
-                                    {cat.label}
-                                </button>
-                            );
-                        })}
+                    {/* Total Count */}
+                    <div className="flex items-center space-x-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+                        <Sparkles size={14} className="text-primary-500" />
+                        <span>พบทั้งหมด {filteredAlbums.length} อัลบั้มกิจกรรม</span>
                     </div>
                 </div>
 
@@ -180,8 +146,8 @@ export default function GalleryPage() {
                         </div>
                         <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">ไม่พบอัลบั้มภาพกิจกรรม</h3>
                         <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-                            {searchTerm || selectedCategory !== "all"
-                                ? "ลองเปลี่ยนคำค้นหา หรือเลือกหมวดหมู่อื่นเพื่อดูอัลบั้มภาพเพิ่มเติม"
+                            {searchTerm
+                                ? "ลองเปลี่ยนคำค้นหา หรือพิมพ์ค้นหาด้วยชื่อกิจกรรมอื่น"
                                 : "ขณะนี้ยังไม่มีอัลบั้มภาพกิจกรรมที่เปิดเผยแพร่"}
                         </p>
                     </div>
@@ -223,13 +189,6 @@ export default function GalleryPage() {
                                                     <path d="M3 12c0 4.97 4.03 9 9 9v-9H3z" fill="#FBBC05"/>
                                                 </svg>
                                                 <span className="text-[10px] font-black text-slate-700 dark:text-slate-300">Google Photos</span>
-                                            </div>
-
-                                            {/* Category Pill */}
-                                            <div className="absolute top-4 left-4 z-10">
-                                                <span className="px-3 py-1 bg-primary-600 text-white text-[10px] font-black rounded-full shadow-md uppercase tracking-wider">
-                                                    {album.category || "กิจกรรม"}
-                                                </span>
                                             </div>
 
                                             {/* Date / Quick Info Overlay at Bottom */}

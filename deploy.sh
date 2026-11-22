@@ -6,9 +6,10 @@ cd /var/www/vhosts/technosriracha.ac.th/httpdocs
 echo "==> 1. Pulling latest code from Git..."
 git pull origin main
 
-echo "==> 1.1 Running Database Migrations..."
+echo "==> 1.1 Running Database Migrations & Clearing Cache..."
 cd backend
 php artisan migrate --force
+php artisan optimize:clear
 cd /var/www/vhosts/technosriracha.ac.th/httpdocs
 
 echo "==> 2. Building Frontend (React Router SPA)..."

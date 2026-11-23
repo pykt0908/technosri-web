@@ -353,7 +353,7 @@ export default function AdminGallery() {
             {/* Modal Dialog for Create/Edit */}
             <AnimatePresence>
                 {modal.show && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 sm:p-6">
                         {/* Backdrop */}
                         <motion.div
                             initial={{ opacity: 0 }}
@@ -368,166 +368,169 @@ export default function AdminGallery() {
                             initial={{ scale: 0.95, opacity: 0, y: 15 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.95, opacity: 0, y: 15 }}
-                            className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden z-10 max-h-[90vh] flex flex-col"
+                            className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden z-10 max-h-[90vh] flex flex-col my-auto"
                         >
                             {/* Modal Header */}
-                            <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                            <div className="px-6 py-4 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 bg-white dark:bg-slate-900 z-10">
                                 <h3 className="font-black text-slate-800 dark:text-white text-lg flex items-center gap-2">
                                     <Camera className="text-primary-500" size={20} />
                                     <span>{modal.data ? "แก้ไขอัลบั้มภาพกิจกรรม" : "เพิ่มอัลบั้มภาพกิจกรรมใหม่"}</span>
                                 </h3>
                                 <button
+                                    type="button"
                                     onClick={handleCloseModal}
-                                    className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 flex items-center justify-center transition-all"
+                                    className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 flex items-center justify-center transition-all cursor-pointer"
                                 >
                                     <X size={16} />
                                 </button>
                             </div>
 
-                            {/* Modal Form Body */}
-                            <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
-                                {/* Title */}
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                                        ชื่องาน / กิจกรรม <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={formTitle}
-                                        onChange={(e) => setFormTitle(e.target.value)}
-                                        placeholder="เช่น กิจกรรมวันไหว้ครู ประจำปีการศึกษา 2567"
-                                        className="w-full text-xs font-medium px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                                    />
-                                </div>
-
-                                {/* Google Photos URL */}
-                                <div>
-                                    <div className="flex items-center justify-between mb-1.5">
-                                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                                            ลิงก์อัลบั้ม Google Photos <span className="text-red-500">*</span>
+                            {/* Modal Form Body with Flexbox fix & scrollable container */}
+                            <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+                                <div className="p-6 space-y-4 overflow-y-auto flex-1 min-h-0 overscroll-contain">
+                                    {/* Title */}
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                                            ชื่องาน / กิจกรรม <span className="text-red-500">*</span>
                                         </label>
-                                        {formGoogleUrl && (
-                                            <a
-                                                href={formGoogleUrl}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-[10px] font-bold text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1"
-                                            >
-                                                ทดสอบเปิดลิงก์ <ExternalLink size={10} />
-                                            </a>
-                                        )}
+                                        <input
+                                            type="text"
+                                            required
+                                            value={formTitle}
+                                            onChange={(e) => setFormTitle(e.target.value)}
+                                            placeholder="เช่น กิจกรรมวันไหว้ครู ประจำปีการศึกษา 2567"
+                                            className="w-full text-xs font-medium px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        />
                                     </div>
-                                    <input
-                                        type="url"
-                                        required
-                                        value={formGoogleUrl}
-                                        onChange={(e) => setFormGoogleUrl(e.target.value)}
-                                        placeholder="https://photos.app.goo.gl/..."
-                                        className="w-full text-xs font-mono px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                                    />
-                                    <p className="text-[10px] text-slate-400 mt-1 font-medium">
-                                        กด "แชร์" ในอัลบั้ม Google Photos แล้วนำลิงก์ (Share link) มาวางที่นี่
-                                    </p>
-                                </div>
 
-                                {/* Event Date */}
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                                        วันที่จัดกิจกรรม
-                                    </label>
-                                    <input
-                                        type="date"
-                                        value={formEventDate}
-                                        onChange={(e) => setFormEventDate(e.target.value)}
-                                        className="w-full text-xs font-medium px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                                    />
-                                </div>
-
-                                {/* Cover Image Upload */}
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                                        รูปภาพหน้าปกอัลบั้ม (Cover Image)
-                                    </label>
-                                    <div 
-                                        onClick={() => document.getElementById("album-cover-upload")?.click()}
-                                        className="relative aspect-[16/9] w-full rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100/50 dark:hover:bg-slate-800/80 transition-all flex flex-col items-center justify-center cursor-pointer overflow-hidden group"
-                                    >
-                                        {previewImage ? (
-                                            <>
-                                                <img src={previewImage} alt="Cover preview" className="w-full h-full object-cover" />
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold">
-                                                    คลิกเพื่อเปลี่ยนรูปภาพ
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <ImageIcon className="text-slate-400 group-hover:text-primary-500 mb-2 transition-colors" size={32} />
-                                                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">คลิกเพื่ออัปโหลดรูปหน้าปก</span>
-                                                <span className="text-[10px] text-slate-400 mt-1">รองรับ JPG, PNG, WebP สูงสุด 10MB</span>
-                                            </>
-                                        )}
+                                    {/* Google Photos URL */}
+                                    <div>
+                                        <div className="flex items-center justify-between mb-1.5">
+                                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                                                ลิงก์อัลบั้ม Google Photos <span className="text-red-500">*</span>
+                                            </label>
+                                            {formGoogleUrl && (
+                                                <a
+                                                    href={formGoogleUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-[10px] font-bold text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1"
+                                                >
+                                                    ทดสอบเปิดลิงก์ <ExternalLink size={10} />
+                                                </a>
+                                            )}
+                                        </div>
+                                        <input
+                                            type="url"
+                                            required
+                                            value={formGoogleUrl}
+                                            onChange={(e) => setFormGoogleUrl(e.target.value)}
+                                            placeholder="https://photos.app.goo.gl/..."
+                                            className="w-full text-xs font-mono px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        />
+                                        <p className="text-[10px] text-slate-400 mt-1 font-medium">
+                                            กด "แชร์" ในอัลบั้ม Google Photos แล้วนำลิงก์ (Share link) มาวางที่นี่
+                                        </p>
                                     </div>
-                                    <input
-                                        type="file"
-                                        id="album-cover-upload"
-                                        accept="image/*"
-                                        className="hidden"
-                                        onChange={handleImageChange}
-                                    />
-                                </div>
 
-                                {/* Description */}
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                                        คำอธิบายสั้นๆ (ถ้ามี)
-                                    </label>
-                                    <textarea
-                                        rows={3}
-                                        value={formDescription}
-                                        onChange={(e) => setFormDescription(e.target.value)}
-                                        placeholder="ระบุรายละเอียดกิจกรรมสั้นๆ หรือสถานที่จัดงาน..."
-                                        className="w-full text-xs font-medium p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                                    />
-                                </div>
-
-                                {/* Status */}
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                                        สถานะการเผยแพร่
-                                    </label>
-                                    <div className="flex gap-4">
-                                        <label className="inline-flex items-center gap-2 cursor-pointer">
-                                            <input
-                                                type="radio"
-                                                name="status"
-                                                value="published"
-                                                checked={formStatus === "published"}
-                                                onChange={() => setFormStatus("published")}
-                                                className="text-primary-600 focus:ring-primary-500"
-                                            />
-                                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">เผยแพร่ทันที (Published)</span>
+                                    {/* Event Date */}
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                                            วันที่จัดกิจกรรม
                                         </label>
-                                        <label className="inline-flex items-center gap-2 cursor-pointer">
-                                            <input
-                                                type="radio"
-                                                name="status"
-                                                value="draft"
-                                                checked={formStatus === "draft"}
-                                                onChange={() => setFormStatus("draft")}
-                                                className="text-primary-600 focus:ring-primary-500"
-                                            />
-                                            <span className="text-xs font-bold text-slate-500">ฉบับร่าง (Draft)</span>
+                                        <input
+                                            type="date"
+                                            value={formEventDate}
+                                            onChange={(e) => setFormEventDate(e.target.value)}
+                                            className="w-full text-xs font-medium px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        />
+                                    </div>
+
+                                    {/* Cover Image Upload */}
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                                            รูปภาพหน้าปกอัลบั้ม (Cover Image)
                                         </label>
+                                        <div 
+                                            onClick={() => document.getElementById("album-cover-upload")?.click()}
+                                            className="relative h-44 sm:h-48 w-full rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100/50 dark:hover:bg-slate-800/80 transition-all flex flex-col items-center justify-center cursor-pointer overflow-hidden group"
+                                        >
+                                            {previewImage ? (
+                                                <>
+                                                    <img src={previewImage} alt="Cover preview" className="w-full h-full object-cover" />
+                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold">
+                                                        คลิกเพื่อเปลี่ยนรูปภาพ
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <ImageIcon className="text-slate-400 group-hover:text-primary-500 mb-2 transition-colors" size={32} />
+                                                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400">คลิกเพื่ออัปโหลดรูปหน้าปก</span>
+                                                    <span className="text-[10px] text-slate-400 mt-1">รองรับ JPG, PNG, WebP สูงสุด 10MB</span>
+                                                </>
+                                            )}
+                                        </div>
+                                        <input
+                                            type="file"
+                                            id="album-cover-upload"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={handleImageChange}
+                                        />
+                                    </div>
+
+                                    {/* Description */}
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                                            คำอธิบายสั้นๆ (ถ้ามี)
+                                        </label>
+                                        <textarea
+                                            rows={3}
+                                            value={formDescription}
+                                            onChange={(e) => setFormDescription(e.target.value)}
+                                            placeholder="ระบุรายละเอียดกิจกรรมสั้นๆ หรือสถานที่จัดงาน..."
+                                            className="w-full text-xs font-medium p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        />
+                                    </div>
+
+                                    {/* Status */}
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                                            สถานะการเผยแพร่
+                                        </label>
+                                        <div className="flex gap-4">
+                                            <label className="inline-flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="radio"
+                                                    name="status"
+                                                    value="published"
+                                                    checked={formStatus === "published"}
+                                                    onChange={() => setFormStatus("published")}
+                                                    className="text-primary-600 focus:ring-primary-500"
+                                                />
+                                                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">เผยแพร่ทันที (Published)</span>
+                                            </label>
+                                            <label className="inline-flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="radio"
+                                                    name="status"
+                                                    value="draft"
+                                                    checked={formStatus === "draft"}
+                                                    onChange={() => setFormStatus("draft")}
+                                                    className="text-primary-600 focus:ring-primary-500"
+                                                />
+                                                <span className="text-xs font-bold text-slate-500">ฉบับร่าง (Draft)</span>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
 
-                                {/* Action Buttons */}
-                                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end space-x-3">
+                                {/* Modal Footer (Always visible & pinned at bottom) */}
+                                <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/40 flex justify-end space-x-3 shrink-0">
                                     <button
                                         type="button"
                                         onClick={handleCloseModal}
-                                        className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                        className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                                     >
                                         ยกเลิก
                                     </button>

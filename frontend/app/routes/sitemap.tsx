@@ -10,7 +10,6 @@ export default function Sitemap() {
                 { name: "หน้าแรก (Home)", path: "/" },
                 { name: "เกี่ยวกับวิทยาลัย (About)", path: "/about" },
                 { name: "ข่าวสารและกิจกรรม (News & Events)", path: "/news" },
-                { name: "ภาพกิจกรรม (Photo Albums)", path: "/gallery" },
                 { name: "ร่วมงานกับเรา (Careers)", path: "/join-us" },
                 { name: "ติดต่อสอบถาม (Contact)", path: "/contact" },
             ]
@@ -29,6 +28,7 @@ export default function Sitemap() {
             group: "Resources & Services (บริการและเอกสาร)",
             links: [
                 { name: "ดาวน์โหลดเอกสาร (Downloads)", path: "/downloads" },
+                { name: "ภาพกิจกรรม (Photo Albums)", path: "/gallery" },
                 { name: "ระบบ V-Cop Student (V-Cop Portal)", path: "https://backend.v-cop.go.th/LoginStudent" },
                 { name: "ระบบสอบออนไลน์ (Online Examination)", path: "https://exam.technosriracha.ac.th/" },
             ]

@@ -75,7 +75,6 @@ export default function Navbar() {
             ]
         },
         { name: "หลักสูตร", href: "/programs", icon: "fas fa-graduation-cap" },
-        { name: "ภาพกิจกรรม", href: "/gallery", icon: "fas fa-camera-retro" },
         { 
             name: "บุคลากร", 
             href: "/personnel", 
@@ -94,7 +93,15 @@ export default function Navbar() {
                 { name: "ระบบสอบออนไลน์", href: "https://exam.technosriracha.ac.th/", icon: "fas fa-file-signature", target: "_blank" }
             ]
         },
-        { name: "ดาวน์โหลด", href: "/downloads", icon: "fas fa-cloud-download-alt" },
+        { 
+            name: "ดาวน์โหลด", 
+            href: "/downloads", 
+            icon: "fas fa-cloud-download-alt",
+            submenu: [
+                { name: "เอกสารดาวน์โหลด", href: "/downloads", icon: "fas fa-file-download" },
+                { name: "ภาพกิจกรรม", href: "/gallery", icon: "fas fa-camera-retro" }
+            ]
+        },
         { name: "ติดต่อเรา", href: "/contact", icon: "fas fa-envelope" },
     ];
 
@@ -128,7 +135,7 @@ export default function Navbar() {
                                 const isHovered = activeHoveredMenu === link.name;
                                 const isSubmenuActive = link.submenu.some(subItem => {
                                     if (subItem.href.startsWith("http") || subItem.href === "#") return false;
-                                    if (subItem.href === "/about" || subItem.href === "/personnel") {
+                                    if (subItem.href === "/about" || subItem.href === "/personnel" || subItem.href === "/downloads") {
                                         return location.pathname === subItem.href;
                                     }
                                     return location.pathname.startsWith(subItem.href);
@@ -189,7 +196,7 @@ export default function Navbar() {
                                                             <NavLink
                                                                 key={subItem.href}
                                                                 to={subItem.href}
-                                                                end={subItem.href === "/about" || subItem.href === "/personnel"}
+                                                                end={subItem.href === "/about" || subItem.href === "/personnel" || subItem.href === "/downloads"}
                                                                 className={({ isActive }) =>
                                                                     `flex items-center space-x-3 px-4 py-2.5 mx-2 rounded-xl text-xs font-bold transition-all ${
                                                                         isActive
@@ -303,7 +310,7 @@ export default function Navbar() {
                                 const isMobileOpen = openMobileSubmenu === link.name;
                                 const isSubmenuActive = link.submenu.some(subItem => {
                                     if (subItem.href.startsWith("http") || subItem.href === "#") return false;
-                                    if (subItem.href === "/about" || subItem.href === "/personnel") {
+                                    if (subItem.href === "/about" || subItem.href === "/personnel" || subItem.href === "/downloads") {
                                         return location.pathname === subItem.href;
                                     }
                                     return location.pathname.startsWith(subItem.href);
@@ -371,7 +378,7 @@ export default function Navbar() {
                                                                         isActive ? "text-primary-600" : "text-gray-500 dark:text-gray-400 hover:text-primary-600"
                                                                     }`
                                                                 }
-                                                                end={subItem.href === "/about" || subItem.href === "/personnel"}
+                                                                end={subItem.href === "/about" || subItem.href === "/personnel" || subItem.href === "/downloads"}
                                                             >
                                                                 <i className={`${subItem.icon} text-xs opacity-60`} aria-hidden="true"></i>
                                                                 <span>{subItem.name}</span>
